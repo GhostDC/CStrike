@@ -2,7 +2,7 @@
 .vs/
 
 # Visual Studio Code
-.vsco/
+.vscode/
 
 # Compiled Object files
 *.slo
