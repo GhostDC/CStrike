@@ -24,6 +24,12 @@ public:
 	UPROPERTY(VisibleAnywhere, Category = "Camera")
 	UCameraComponent *FPSCamera;
 
+	UPROPERTY()
+	FHitResult HitResult;
+
+	UPROPERTY(EditAnywhere, Category = "Config")
+	float TraceRange = 3000.0f;
+
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
@@ -40,4 +46,7 @@ public:
 
 	UFUNCTION(BlueprintCallable, Category = "Movement")
 	void MoveRight(float Val);
+
+	UFUNCTION()
+	void RayTracePerTick();
 };

@@ -3,6 +3,7 @@
 #include "Player/CSPlayer.h"
 #include "Camera/CameraComponent.h"
 #include "Components/SkeletalMeshComponent.h"
+#include "DrawDebugHelpers.h"
 
 // Sets default values
 ACSPlayer::ACSPlayer()
@@ -32,6 +33,7 @@ void ACSPlayer::BeginPlay()
 void ACSPlayer::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
+	RayTracePerTick();
 }
 
 // Called to bind functionality to input
@@ -53,5 +55,19 @@ void ACSPlayer::MoveRight(float Val)
 	if (Val != 0.0f)
 	{
 		AddMovementInput(GetActorRightVector(), Val);
+	}
+}
+
+void ACSPlayer::RayTracePerTick()
+{
+	FVector TraceStart = FPSCamera->GetComponentLocation();
+	FVector TraceEnd = TraceStart + (FPSCamera->GetForwardVector() * TraceRange);
+	FCollisionQueryParams CollisionQueryParams;
+	CollisionQueryParams.AddIgnoredActor(this);
+	GetWorld()->LineTraceSingleByChannel(HitResult, TraceStart, TraceEnd, ECC_Visibility, CollisionQueryParams);
+	DrawDebugLine(GetWorld(), TraceStart, TraceEnd, FColor::Orange);
+	if (HitResult.bBlockingHit)
+	{
+		DrawDebugPoint(GetWorld(), HitResult.ImpactPoint, 15.0f, FColor::Orange);
 	}
 }
