@@ -6,6 +6,9 @@
 #include "GameFramework/Character.h"
 #include "CSPlayer.generated.h"
 
+class UCameraComponent;
+class USkeletalMeshComponent;
+
 UCLASS()
 class CSTRIKE_API ACSPlayer : public ACharacter
 {
@@ -15,15 +18,26 @@ public:
 	// Sets default values for this character's properties
 	ACSPlayer();
 
+	UPROPERTY(VisibleAnywhere, Category = "Mesh")
+	USkeletalMeshComponent *Mesh1P;
+
+	UPROPERTY(VisibleAnywhere, Category = "Camera")
+	UCameraComponent *FPSCamera;
+
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 
-public:	
+public:
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 
 	// Called to bind functionality to input
-	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
+	virtual void SetupPlayerInputComponent(class UInputComponent *PlayerInputComponent) override;
 
+	UFUNCTION(BlueprintCallable, Category = "Movement")
+	void MoveForward(float Val);
+
+	UFUNCTION(BlueprintCallable, Category = "Movement")
+	void MoveRight(float Val);
 };
