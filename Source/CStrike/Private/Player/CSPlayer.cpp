@@ -11,15 +11,18 @@ ACSPlayer::ACSPlayer()
 	// Set this character to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
 
+	// Set first player Camera
 	FPSCamera = CreateDefaultSubobject<UCameraComponent>(TEXT("FPSCamera"));
 	FPSCamera->bUsePawnControlRotation = true;
 	FPSCamera->SetupAttachment(RootComponent);
 
+	// Set first player mesh
 	Mesh1P = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("Mesh1P"));
 	Mesh1P->bOnlyOwnerSee = true;
 	Mesh1P->SetCastShadow(false);
 	Mesh1P->SetupAttachment(FPSCamera);
 
+	// Set player can not see third mesh
 	GetMesh()->bOwnerNoSee = true;
 }
 
@@ -42,22 +45,7 @@ void ACSPlayer::SetupPlayerInputComponent(UInputComponent *PlayerInputComponent)
 	Super::SetupPlayerInputComponent(PlayerInputComponent);
 }
 
-void ACSPlayer::MoveForward(float Val)
-{
-	if (Val != 0.0f)
-	{
-		AddMovementInput(GetActorForwardVector(), Val);
-	}
-}
-
-void ACSPlayer::MoveRight(float Val)
-{
-	if (Val != 0.0f)
-	{
-		AddMovementInput(GetActorRightVector(), Val);
-	}
-}
-
+// Called to ray trace per tick
 void ACSPlayer::RayTracePerTick()
 {
 	FVector TraceStart = FPSCamera->GetComponentLocation();
@@ -69,5 +57,23 @@ void ACSPlayer::RayTracePerTick()
 	if (HitResult.bBlockingHit)
 	{
 		DrawDebugPoint(GetWorld(), HitResult.ImpactPoint, 15.0f, FColor::Orange);
+	}
+}
+
+// Called when player move forward
+void ACSPlayer::MoveForward(float Val)
+{
+	if (Val != 0.0f)
+	{
+		AddMovementInput(GetActorForwardVector(), Val);
+	}
+}
+
+// Called when player move right
+void ACSPlayer::MoveRight(float Val)
+{
+	if (Val != 0.0f)
+	{
+		AddMovementInput(GetActorRightVector(), Val);
 	}
 }

@@ -18,9 +18,11 @@ public:
 	// Sets default values for this actor's properties
 	AItem_Pickup();
 
+	// Set pick up item collision
 	UPROPERTY(VisibleAnywhere, Category = "Collision")
 	UBoxComponent *ItemCollisionBox;
 
+	// set pick up item mesh
 	UPROPERTY(VisibleAnywhere, Category = "Mesh")
 	UStaticMeshComponent *ItemMesh;
 
@@ -32,6 +34,7 @@ public:
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 
+	// Called when player overlap this actor
 	UFUNCTION()
 	void OverlapHandler(UPrimitiveComponent *OverlappedComponent, AActor *OtherActor, UPrimitiveComponent *OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult &SweepResult);
 };

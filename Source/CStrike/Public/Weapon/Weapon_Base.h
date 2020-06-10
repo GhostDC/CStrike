@@ -17,9 +17,11 @@ public:
 	// Sets default values for this actor's properties
 	AWeapon_Base();
 
+	// Set weapon first person mesh
 	UPROPERTY(VisibleAnywhere, Category = "Mesh")
 	USkeletalMeshComponent *WeaponMesh1P;
 
+	// Set weapon third person mesh
 	UPROPERTY(VisibleAnywhere, Category = "Mesh")
 	USkeletalMeshComponent *WeaponMesh3P;
 
@@ -31,12 +33,15 @@ public:
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 
+	// Called when weapon primary fire
 	UFUNCTION()
 	void WeaponPrimaryFire();
 
+	// Called when weapon secondry fire
 	UFUNCTION()
 	void WeaponSecondryFire();
 
+	// Called when weapon reload
 	UFUNCTION()
 	void WeaponReload();
 };

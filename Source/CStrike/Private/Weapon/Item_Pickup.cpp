@@ -11,11 +11,13 @@ AItem_Pickup::AItem_Pickup()
 	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
 
+	// Set pick up item mesh
 	ItemCollisionBox = CreateDefaultSubobject<UBoxComponent>(TEXT("IteamCollisionBox"));
 	ItemCollisionBox->SetGenerateOverlapEvents(true);
 	ItemCollisionBox->OnComponentBeginOverlap.AddDynamic(this, &AItem_Pickup::OverlapHandler);
 	RootComponent = ItemCollisionBox;
 
+	// Set pick up item mesh
 	ItemMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("ItemMesh"));
 	ItemMesh->SetSimulatePhysics(true);
 	ItemMesh->SetupAttachment(RootComponent);
@@ -33,9 +35,9 @@ void AItem_Pickup::Tick(float DeltaTime)
 	Super::Tick(DeltaTime);
 }
 
+// Called when player overlap this actor
 void AItem_Pickup::OverlapHandler(UPrimitiveComponent *OverlappedComponent, AActor *OtherActor, UPrimitiveComponent *OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult &SweepResult)
 {
-	UE_LOG(LogTemp, Warning, TEXT("Overlap"));
 	if (OtherActor->IsA<ACSPlayer>())
 	{
 		this->Destroy();
