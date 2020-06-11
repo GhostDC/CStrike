@@ -6,6 +6,7 @@
 #include "GameFramework/Character.h"
 #include "CSPlayer.generated.h"
 
+class AWeapon_Base;
 class UCameraComponent;
 class USkeletalMeshComponent;
 
@@ -25,6 +26,10 @@ public:
 	// Set first player camera
 	UPROPERTY(VisibleAnywhere, Category = "Camera")
 	UCameraComponent *FPSCamera;
+
+	// Set player weapon slot
+	UPROPERTY(VisibleAnywhere, Category = "Weapon")
+	AWeapon_Base *CurrentWeapon;
 
 	// Catch ray trace hit result
 	UPROPERTY()
@@ -56,4 +61,8 @@ public:
 	// Called when player wants to move right
 	UFUNCTION(BlueprintCallable, Category = "Movement")
 	void MoveRight(float Val);
+
+	// Called when player wants to drop item
+	UFUNCTION(BlueprintCallable, Category = "Action")
+	void Drop();
 };

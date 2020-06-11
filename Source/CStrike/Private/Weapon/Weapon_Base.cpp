@@ -1,6 +1,7 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 #include "Weapon/Weapon_Base.h"
+#include "Weapon/Item_Pickup.h"
 #include "Components/SkeletalMeshComponent.h"
 
 // Sets default values
@@ -47,4 +48,15 @@ void AWeapon_Base::WeaponSecondryFire()
 void AWeapon_Base::WeaponReload()
 {
 	UE_LOG(LogTemp, Log, TEXT("Weapon Reload"));
+}
+
+// Called player drop weapon and spawn a pick up blueprint for weapon
+void AWeapon_Base::WeaponDrop()
+{
+	if (PickupBlueprint)
+	{
+		FActorSpawnParameters SpawnParameter;
+		AItem_Pickup *PickupClass = GetWorld()->SpawnActor<AItem_Pickup>(PickupBlueprint, GetActorTransform(), SpawnParameter);
+		PickupClass->ItemMesh->AddImpulse(GetActorForwardVector() * 300, NAME_None, true);
+	}
 }

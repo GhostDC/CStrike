@@ -2,6 +2,7 @@
 
 #include "Weapon/Item_Pickup.h"
 #include "Player/CSPlayer.h"
+#include "Weapon/Weapon_Base.h"
 #include "Components/BoxComponent.h"
 #include "Components/StaticMeshComponent.h"
 
@@ -40,6 +41,10 @@ void AItem_Pickup::OverlapHandler(UPrimitiveComponent *OverlappedComponent, AAct
 {
 	if (OtherActor->IsA<ACSPlayer>())
 	{
+		ACSPlayer *Player = Cast<ACSPlayer>(OtherActor);
+		FActorSpawnParameters SpawnParameters;
+		AWeapon_Base *ItemBP = GetWorld()->SpawnActor<AWeapon_Base>(ItemBlueprint, Player->GetActorTransform(), SpawnParameters);
+		Player->CurrentWeapon = ItemBP;
 		this->Destroy();
 	}
 }

@@ -6,6 +6,7 @@
 #include "GameFramework/Actor.h"
 #include "Weapon_Base.generated.h"
 
+class AItem_Pickup;
 class USkeletalMeshComponent;
 
 UCLASS()
@@ -25,6 +26,10 @@ public:
 	UPROPERTY(VisibleAnywhere, Category = "Mesh")
 	USkeletalMeshComponent *WeaponMesh3P;
 
+	// Set weapon pick up blueprint after drop
+	UPROPERTY(EditAnywhere, Category = "Pickup")
+	TSubclassOf<AItem_Pickup> PickupBlueprint;
+
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
@@ -34,14 +39,18 @@ public:
 	virtual void Tick(float DeltaTime) override;
 
 	// Called when weapon primary fire
-	UFUNCTION()
+	UFUNCTION(BlueprintCallable, Category = "Action")
 	void WeaponPrimaryFire();
 
 	// Called when weapon secondry fire
-	UFUNCTION()
+	UFUNCTION(BlueprintCallable, Category = "Action")
 	void WeaponSecondryFire();
 
 	// Called when weapon reload
-	UFUNCTION()
+	UFUNCTION(BlueprintCallable, Category = "Action")
 	void WeaponReload();
+
+	// Called when weapon drop
+	UFUNCTION(BlueprintCallable, Category = "Action")
+	void WeaponDrop();
 };

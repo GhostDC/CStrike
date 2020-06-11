@@ -6,6 +6,7 @@
 #include "GameFramework/Actor.h"
 #include "Item_Pickup.generated.h"
 
+class AWeapon_Base;
 class UBoxComponent;
 class UStaticMeshComponent;
 
@@ -25,6 +26,10 @@ public:
 	// set pick up item mesh
 	UPROPERTY(VisibleAnywhere, Category = "Mesh")
 	UStaticMeshComponent *ItemMesh;
+
+	// Set player pick up blueprint
+	UPROPERTY(EditAnywhere, Category = "Item")
+	TSubclassOf<AWeapon_Base> ItemBlueprint;
 
 protected:
 	// Called when the game starts or when spawned

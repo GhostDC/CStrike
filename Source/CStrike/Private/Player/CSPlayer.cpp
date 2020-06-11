@@ -1,6 +1,7 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 #include "Player/CSPlayer.h"
+#include "Weapon/Weapon_Base.h"
 #include "Camera/CameraComponent.h"
 #include "Components/SkeletalMeshComponent.h"
 #include "DrawDebugHelpers.h"
@@ -75,5 +76,14 @@ void ACSPlayer::MoveRight(float Val)
 	if (Val != 0.0f)
 	{
 		AddMovementInput(GetActorRightVector(), Val);
+	}
+}
+
+// Called when player want to drop item
+void ACSPlayer::Drop()
+{
+	if (CurrentWeapon)
+	{
+		CurrentWeapon->WeaponDrop();
 	}
 }
