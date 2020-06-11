@@ -44,7 +44,7 @@ void AItem_Pickup::OverlapHandler(UPrimitiveComponent *OverlappedComponent, AAct
 		ACSPlayer *Player = Cast<ACSPlayer>(OtherActor);
 		FActorSpawnParameters SpawnParameters;
 		AWeapon_Base *ItemBP = GetWorld()->SpawnActor<AWeapon_Base>(ItemBlueprint, Player->GetActorTransform(), SpawnParameters);
-		Player->CurrentWeapon = ItemBP;
+		ItemBP->WeaponDraw(Player);
 		this->Destroy();
 	}
 }

@@ -1,6 +1,7 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 #include "Weapon/Weapon_Base.h"
+#include "Player/CSPlayer.h"
 #include "Weapon/Item_Pickup.h"
 #include "Components/SkeletalMeshComponent.h"
 
@@ -50,6 +51,19 @@ void AWeapon_Base::WeaponReload()
 	UE_LOG(LogTemp, Log, TEXT("Weapon Reload"));
 }
 
+// Called when player equip this weapon
+void AWeapon_Base::WeaponDraw(ACSPlayer *DrawPlayer)
+{
+	if (DrawPlayer)
+	{
+		WeaponOwner = DrawPlayer;
+		this->AttachToComponent(WeaponOwner->Mesh1P, FAttachmentTransformRules::SnapToTargetIncludingScale, TEXT("WeaponSocket"));
+		WeaponOwner->CurrentWeapon = this;
+		WeaponMesh1P->PlayAnimation(DrawAnimation[0], false);
+		WeaponOwner->Mesh1P->PlayAnimation(HandDrawAnimation[0], false);
+	}
+}
+
 // Called player drop weapon and spawn a pick up blueprint for weapon
 void AWeapon_Base::WeaponDrop()
 {
@@ -58,5 +72,6 @@ void AWeapon_Base::WeaponDrop()
 		FActorSpawnParameters SpawnParameter;
 		AItem_Pickup *PickupClass = GetWorld()->SpawnActor<AItem_Pickup>(PickupBlueprint, GetActorTransform(), SpawnParameter);
 		PickupClass->ItemMesh->AddImpulse(GetActorForwardVector() * 300, NAME_None, true);
+		WeaponOwner->CurrentWeapon = nullptr;
 	}
 }

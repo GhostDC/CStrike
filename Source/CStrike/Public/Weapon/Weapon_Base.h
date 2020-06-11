@@ -6,6 +6,7 @@
 #include "GameFramework/Actor.h"
 #include "Weapon_Base.generated.h"
 
+class ACSPlayer;
 class AItem_Pickup;
 class USkeletalMeshComponent;
 
@@ -30,6 +31,18 @@ public:
 	UPROPERTY(EditAnywhere, Category = "Pickup")
 	TSubclassOf<AItem_Pickup> PickupBlueprint;
 
+	// Weapon owner
+	UPROPERTY(EditAnywhere, Category = "Owner")
+	ACSPlayer *WeaponOwner;
+
+	// Set weapon draw animation
+	UPROPERTY(EditAnywhere, Category = "Animation")
+	TArray<UAnimationAsset *> DrawAnimation;
+
+	// Set hand draw this weapon animation
+	UPROPERTY(EditAnywhere, Category = "Animation")
+	TArray<UAnimationAsset *> HandDrawAnimation;
+
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
@@ -49,6 +62,10 @@ public:
 	// Called when weapon reload
 	UFUNCTION(BlueprintCallable, Category = "Action")
 	void WeaponReload();
+
+	// Called when weapon equip
+	UFUNCTION(BlueprintCallable, Category = "Action")
+	void WeaponDraw(ACSPlayer *DrawPlayer);
 
 	// Called when weapon drop
 	UFUNCTION(BlueprintCallable, Category = "Action")
