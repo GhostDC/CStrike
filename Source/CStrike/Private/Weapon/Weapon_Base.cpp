@@ -3,6 +3,7 @@
 #include "Weapon/Weapon_Base.h"
 #include "Player/CSPlayer.h"
 #include "Weapon/Item_Pickup.h"
+#include "Camera/CameraComponent.h"
 #include "Components/SkeletalMeshComponent.h"
 
 // Sets default values
@@ -67,11 +68,8 @@ void AWeapon_Base::WeaponDraw(ACSPlayer *DrawPlayer)
 // Called player drop weapon and spawn a pick up blueprint for weapon
 void AWeapon_Base::WeaponDrop()
 {
-	if (PickupBlueprint)
-	{
-		FActorSpawnParameters SpawnParameter;
-		AItem_Pickup *PickupClass = GetWorld()->SpawnActor<AItem_Pickup>(PickupBlueprint, GetActorTransform(), SpawnParameter);
-		PickupClass->ItemMesh->AddImpulse(GetActorForwardVector() * 300, NAME_None, true);
-		WeaponOwner->CurrentWeapon = nullptr;
-	}
+	AItem_Pickup *PickupClass = GetWorld()->SpawnActor<AItem_Pickup>(PickupBlueprint, GetActorTransform());
+	PickupClass->ItemMesh->AddImpulse(WeaponOwner->FPSCamera->GetForwardVector() * 300, NAME_None, true);
+	WeaponOwner->CurrentWeapon = nullptr;
+	Destroy();
 }

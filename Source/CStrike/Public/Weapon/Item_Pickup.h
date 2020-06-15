@@ -31,6 +31,10 @@ public:
 	UPROPERTY(EditAnywhere, Category = "Item")
 	TSubclassOf<AWeapon_Base> ItemBlueprint;
 
+	// Set actor spawn time
+	UPROPERTY(VisibleAnywhere, Category = "Item")
+	int32 SpawnTime;
+
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;

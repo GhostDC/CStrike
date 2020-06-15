@@ -8,6 +8,7 @@
 
 class ACSPlayer;
 class AItem_Pickup;
+class UAnimationAsset;
 class USkeletalMeshComponent;
 
 UCLASS()

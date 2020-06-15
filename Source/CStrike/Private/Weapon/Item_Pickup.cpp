@@ -13,27 +13,32 @@ AItem_Pickup::AItem_Pickup()
 	PrimaryActorTick.bCanEverTick = true;
 
 	// Set pick up item mesh
-	ItemCollisionBox = CreateDefaultSubobject<UBoxComponent>(TEXT("IteamCollisionBox"));
-	ItemCollisionBox->SetGenerateOverlapEvents(true);
-	ItemCollisionBox->OnComponentBeginOverlap.AddDynamic(this, &AItem_Pickup::OverlapHandler);
-	RootComponent = ItemCollisionBox;
-
-	// Set pick up item mesh
 	ItemMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("ItemMesh"));
 	ItemMesh->SetSimulatePhysics(true);
-	ItemMesh->SetupAttachment(RootComponent);
+	RootComponent = ItemMesh;
+
+	// Set pick up item mesh
+	ItemCollisionBox = CreateDefaultSubobject<UBoxComponent>(TEXT("IteamCollisionBox"));
+	ItemCollisionBox->SetGenerateOverlapEvents(false);
+	ItemCollisionBox->OnComponentBeginOverlap.AddDynamic(this, &AItem_Pickup::OverlapHandler);
+	ItemCollisionBox->SetupAttachment(RootComponent);
 }
 
 // Called when the game starts or when spawned
 void AItem_Pickup::BeginPlay()
 {
 	Super::BeginPlay();
+	SpawnTime = FPlatformTime::Seconds();
 }
 
 // Called every frame
 void AItem_Pickup::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
+	if (FPlatformTime::Seconds() - SpawnTime >= 1.5f)
+	{
+		ItemCollisionBox->SetGenerateOverlapEvents(true);
+	}
 }
 
 // Called when player overlap this actor
