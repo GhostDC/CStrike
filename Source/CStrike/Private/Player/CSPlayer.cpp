@@ -61,6 +61,8 @@ void ACSPlayer::RayTracePerTick()
 	}
 }
 
+//////////////////////////////////////////////////////
+// Movement
 // Called when player move forward
 void ACSPlayer::MoveForward(float Val)
 {
@@ -79,11 +81,32 @@ void ACSPlayer::MoveRight(float Val)
 	}
 }
 
+//////////////////////////////////////////////////////
+// Weapon action
+// Called when player wants to primary fire
+void ACSPlayer::PlayerFirePrimary()
+{
+	if (CurrentWeapon)
+		CurrentWeapon->WeaponPrimaryFire();
+}
+
+// Called when player want to secondary fire
+void ACSPlayer::PlayerFireSecondary()
+{
+	if (CurrentWeapon)
+		CurrentWeapon->WeaponSecondryFire();
+}
+
+// Called when player wants to reload
+void ACSPlayer::PlayerReload()
+{
+	if (CurrentWeapon)
+		CurrentWeapon->WeaponReload();
+}
+
 // Called when player want to drop item
 void ACSPlayer::Drop()
 {
 	if (CurrentWeapon)
-	{
 		CurrentWeapon->WeaponDrop();
-	}
 }

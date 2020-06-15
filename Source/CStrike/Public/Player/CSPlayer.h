@@ -54,6 +54,8 @@ public:
 	// Called to bind functionality to input
 	virtual void SetupPlayerInputComponent(class UInputComponent *PlayerInputComponent) override;
 
+	//////////////////////////////////////////////////////
+	// Movement
 	// Called when player wants to move forward
 	UFUNCTION(BlueprintCallable, Category = "Movement")
 	void MoveForward(float Val);
@@ -61,6 +63,20 @@ public:
 	// Called when player wants to move right
 	UFUNCTION(BlueprintCallable, Category = "Movement")
 	void MoveRight(float Val);
+
+	//////////////////////////////////////////////////////
+	// Weapon action
+	// Called when player wants to primary fire
+	UFUNCTION(BlueprintCallable, Category = "Action")
+	void PlayerFirePrimary();
+
+	// Called when player wants to secondary fire
+	UFUNCTION(BlueprintCallable, Category = "Action")
+	void PlayerFireSecondary();
+
+	// Called when player wants to reload or when weapon ammo empty and primary fire release
+	UFUNCTION(BlueprintCallable, Category = "Action")
+	void PlayerReload();
 
 	// Called when player wants to drop item
 	UFUNCTION(BlueprintCallable, Category = "Action")
