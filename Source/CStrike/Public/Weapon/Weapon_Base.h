@@ -36,13 +36,17 @@ public:
 	UPROPERTY(EditAnywhere, Category = "Owner")
 	ACSPlayer *WeaponOwner;
 
+	// Set weapon fire animation
+	UPROPERTY(EditAnywhere, Category = "Animation")
+	TArray<UAnimationAsset *> FireAnimation;
+
+	// Set weapon reload animation
+	UPROPERTY(EditAnywhere, Category = "Animation")
+	TArray<UAnimationAsset *> ReloadAnimation;
+
 	// Set weapon draw animation
 	UPROPERTY(EditAnywhere, Category = "Animation")
 	TArray<UAnimationAsset *> DrawAnimation;
-
-	// Set hand draw this weapon animation
-	UPROPERTY(EditAnywhere, Category = "Animation")
-	TArray<UAnimationAsset *> HandDrawAnimation;
 
 protected:
 	// Called when the game starts or when spawned

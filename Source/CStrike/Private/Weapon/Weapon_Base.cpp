@@ -37,7 +37,12 @@ void AWeapon_Base::Tick(float DeltaTime)
 // Called when weapon primary fire
 void AWeapon_Base::WeaponPrimaryFire()
 {
-	UE_LOG(LogTemp, Log, TEXT("Weapon primary fire"));
+	if (WeaponOwner)
+	{
+		UE_LOG(LogTemp, Log, TEXT("Weapon primary fire"));
+		WeaponMesh1P->PlayAnimation(FireAnimation[0], false);
+		WeaponOwner->Mesh1P->PlayAnimation(FireAnimation[1], false);
+	}
 }
 
 // Called when weapon secondry fire
@@ -49,7 +54,12 @@ void AWeapon_Base::WeaponSecondryFire()
 // Called when weapon reload
 void AWeapon_Base::WeaponReload()
 {
-	UE_LOG(LogTemp, Log, TEXT("Weapon Reload"));
+	if (WeaponOwner)
+	{
+		UE_LOG(LogTemp, Log, TEXT("Weapon Reload"));
+		WeaponMesh1P->PlayAnimation(ReloadAnimation[0], false);
+		WeaponOwner->Mesh1P->PlayAnimation(ReloadAnimation[1], false);
+	}
 }
 
 // Called when player equip this weapon
@@ -61,7 +71,7 @@ void AWeapon_Base::WeaponDraw(ACSPlayer *DrawPlayer)
 		this->AttachToComponent(WeaponOwner->Mesh1P, FAttachmentTransformRules::SnapToTargetIncludingScale, TEXT("WeaponSocket"));
 		WeaponOwner->CurrentWeapon = this;
 		WeaponMesh1P->PlayAnimation(DrawAnimation[0], false);
-		WeaponOwner->Mesh1P->PlayAnimation(HandDrawAnimation[0], false);
+		WeaponOwner->Mesh1P->PlayAnimation(DrawAnimation[1], false);
 	}
 }
 
