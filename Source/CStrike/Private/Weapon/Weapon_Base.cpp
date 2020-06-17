@@ -54,7 +54,7 @@ void AWeapon_Base::WeaponSecondryFire()
 // Called when weapon reload
 void AWeapon_Base::WeaponReload()
 {
-	if (WeaponOwner)
+	if (WeaponOwner && (WeaponType == EWeaponType::Knife || WeaponType == EWeaponType::C4))
 	{
 		UE_LOG(LogTemp, Log, TEXT("Weapon Reload"));
 		WeaponMesh1P->PlayAnimation(ReloadAnimation[0], false);
@@ -81,5 +81,6 @@ void AWeapon_Base::WeaponDrop()
 	AItem_Pickup *PickupClass = GetWorld()->SpawnActor<AItem_Pickup>(PickupBlueprint, GetActorTransform());
 	PickupClass->ItemMesh->AddImpulse(WeaponOwner->FPSCamera->GetForwardVector() * 300, NAME_None, true);
 	WeaponOwner->CurrentWeapon = nullptr;
+	WeaponOwner->Mesh1P->PlayAnimation(nullptr, false);
 	Destroy();
 }

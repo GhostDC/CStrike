@@ -11,6 +11,21 @@ class AItem_Pickup;
 class UAnimationAsset;
 class USkeletalMeshComponent;
 
+// Setup weapon type
+UENUM()
+enum EWeaponType
+{
+	Knife,
+	Pistol,
+	SubMachineGun,
+	ShotGun,
+	MachineGun,
+	Rifle,
+	SniperRifle,
+	C4,
+	Grenade
+};
+
 UCLASS()
 class CSTRIKE_API AWeapon_Base : public AActor
 {
@@ -35,6 +50,10 @@ public:
 	// Weapon owner
 	UPROPERTY(EditAnywhere, Category = "Owner")
 	ACSPlayer *WeaponOwner;
+
+	// Weapon type
+	UPROPERTY(EditAnywhere, Category = "Config")
+	TEnumAsByte<EWeaponType> WeaponType;
 
 	// Set weapon fire animation
 	UPROPERTY(EditAnywhere, Category = "Animation")
