@@ -67,9 +67,14 @@ public:
 	UPROPERTY(EditAnywhere, Category = "Animation")
 	TArray<UAnimationAsset *> DrawAnimation;
 
+	// Set Weapon draw animation
+	UPROPERTY(EditAnywhere, Category = "Animation")
+	TArray<UAnimationAsset *> InspectAnimation;
+
 protected:
 	// Called when the game starts or when spawned
-	virtual void BeginPlay() override;
+	virtual void
+	BeginPlay() override;
 
 public:
 	// Called every frame
@@ -94,4 +99,8 @@ public:
 	// Called when weapon drop
 	UFUNCTION(BlueprintCallable, Category = "Action")
 	void WeaponDrop();
+
+	// Called when player want inspect weapon
+	UFUNCTION(BlueprintCallable, Category = "Action")
+	void WeaponInspect();
 };

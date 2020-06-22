@@ -84,3 +84,10 @@ void AWeapon_Base::WeaponDrop()
 	WeaponOwner->Mesh1P->PlayAnimation(nullptr, false);
 	Destroy();
 }
+
+// Called player want to inspect weapon
+void AWeapon_Base::WeaponInspect()
+{
+	WeaponMesh1P->PlayAnimation(InspectAnimation[0], false);
+	WeaponOwner->Mesh1P->PlayAnimation(InspectAnimation[1], false);
+}

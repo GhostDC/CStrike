@@ -105,8 +105,17 @@ void ACSPlayer::PlayerReload()
 }
 
 // Called when player want to drop item
-void ACSPlayer::Drop()
+void ACSPlayer::PlayerDrop()
 {
 	if (CurrentWeapon)
 		CurrentWeapon->WeaponDrop();
+}
+
+// Called when player want to inpect weapon
+void ACSPlayer::PlayerInspect()
+{
+	if (CurrentWeapon)
+	{
+		CurrentWeapon->WeaponInspect();
+	}
 }

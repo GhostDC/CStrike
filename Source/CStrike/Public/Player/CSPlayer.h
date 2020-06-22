@@ -80,5 +80,9 @@ public:
 
 	// Called when player wants to drop item
 	UFUNCTION(BlueprintCallable, Category = "Action")
-	void Drop();
+	void PlayerDrop();
+
+	// Called when player wants to inspect weapon
+	UFUNCTION(BlueprintCallable, Category = "Action")
+	void PlayerInspect();
 };
