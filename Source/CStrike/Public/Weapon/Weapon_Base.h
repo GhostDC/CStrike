@@ -11,6 +11,35 @@ class AItem_Pickup;
 class UAnimationAsset;
 class USkeletalMeshComponent;
 
+// Setup weapon data
+USTRUCT()
+struct FWeaponData
+{
+	GENERATED_BODY()
+
+public:
+	UPROPERTY(EditAnywhere, Category = "Config")
+	bool isFullAuto;
+
+	UPROPERTY(EditAnywhere, Category = "Config")
+	int32 baseDamage;
+
+	UPROPERTY(EditAnywhere, Category = "Config")
+	int32 PrimaryClipSize;
+
+	UPROPERTY(EditAnywhere, Category = "Config")
+	int32 ReserveAmmoMax;
+
+	UPROPERTY(EditAnywhere, Category = "Config")
+	int32 WeaponPrice;
+
+	UPROPERTY(EditAnywhere, Category = "Config")
+	float CycleTime;
+
+	UPROPERTY(EditAnywhere, Category = "Config")
+	float Weight;
+};
+
 // Setup weapon type
 UENUM()
 enum EWeaponType
@@ -55,6 +84,10 @@ public:
 	UPROPERTY(EditAnywhere, Category = "Config")
 	TEnumAsByte<EWeaponType> WeaponType;
 
+	// Weapon data
+	UPROPERTY(EditAnywhere, Category = "Config")
+	FWeaponData WeaponConfig;
+
 	// Set weapon fire animation
 	UPROPERTY(EditAnywhere, Category = "Animation")
 	TArray<UAnimationAsset *> FireAnimation;
@@ -70,6 +103,11 @@ public:
 	// Set Weapon draw animation
 	UPROPERTY(EditAnywhere, Category = "Animation")
 	TArray<UAnimationAsset *> InspectAnimation;
+
+	// WeaponAmmo
+	int32 PrimaryAmmo;
+
+	int32 ReserveAmmo;
 
 protected:
 	// Called when the game starts or when spawned

@@ -26,6 +26,9 @@ AWeapon_Base::AWeapon_Base()
 void AWeapon_Base::BeginPlay()
 {
 	Super::BeginPlay();
+
+	PrimaryAmmo = WeaponConfig.PrimaryClipSize;
+	ReserveAmmo = WeaponConfig.ReserveAmmoMax;
 }
 
 // Called every frame
@@ -40,8 +43,17 @@ void AWeapon_Base::WeaponPrimaryFire()
 	if (WeaponOwner)
 	{
 		UE_LOG(LogTemp, Log, TEXT("Weapon primary fire"));
-		WeaponMesh1P->PlayAnimation(FireAnimation[0], false);
-		WeaponOwner->Mesh1P->PlayAnimation(FireAnimation[1], false);
+		if (WeaponType == EWeaponType::Knife)
+		{
+			WeaponMesh1P->PlayAnimation(FireAnimation[0], false);
+			WeaponOwner->Mesh1P->PlayAnimation(FireAnimation[1], false);
+		}
+		else if (PrimaryAmmo > 0)
+		{
+			WeaponMesh1P->PlayAnimation(FireAnimation[0], false);
+			WeaponOwner->Mesh1P->PlayAnimation(FireAnimation[1], false);
+			PrimaryAmmo--;
+		}
 	}
 }
 
@@ -54,9 +66,19 @@ void AWeapon_Base::WeaponSecondryFire()
 // Called when weapon reload
 void AWeapon_Base::WeaponReload()
 {
-	if (WeaponOwner && (WeaponType == EWeaponType::Knife || WeaponType == EWeaponType::C4))
+	if (WeaponOwner && !(WeaponType == EWeaponType::Knife || WeaponType == EWeaponType::C4 || WeaponType == EWeaponType::Grenade))
 	{
 		UE_LOG(LogTemp, Log, TEXT("Weapon Reload"));
+		ReserveAmmo -= WeaponConfig.PrimaryClipSize - PrimaryAmmo;
+		if (ReserveAmmo >= 0)
+		{
+			PrimaryAmmo = WeaponConfig.PrimaryClipSize;
+		}
+		else
+		{
+			PrimaryAmmo = WeaponConfig.PrimaryClipSize - ReserveAmmo;
+			ReserveAmmo = 0;
+		}
 		WeaponMesh1P->PlayAnimation(ReloadAnimation[0], false);
 		WeaponOwner->Mesh1P->PlayAnimation(ReloadAnimation[1], false);
 	}
