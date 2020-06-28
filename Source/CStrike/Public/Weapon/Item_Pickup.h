@@ -35,6 +35,14 @@ public:
 	UPROPERTY(VisibleAnywhere, Category = "Item")
 	int32 SpawnTime;
 
+	// Drop weapon ammo primary
+	UPROPERTY(EditAnywhere, Category = "Config")
+	int32 PrimaryAmmo;
+
+	// Drop weapon ammo reserve
+	UPROPERTY(EditAnywhere, Category = "Config")
+	int32 ReserveAmmo;
+
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;

@@ -47,11 +47,13 @@ void AWeapon_Base::WeaponPrimaryFire()
 		{
 			WeaponMesh1P->PlayAnimation(FireAnimation[0], false);
 			WeaponOwner->Mesh1P->PlayAnimation(FireAnimation[1], false);
+			UE_LOG(LogTemp, Warning, TEXT("PrimaryAmmo:%d ReserveAmmo:%d"), PrimaryAmmo, ReserveAmmo);
 		}
 		else if (PrimaryAmmo > 0)
 		{
 			WeaponMesh1P->PlayAnimation(FireAnimation[0], false);
 			WeaponOwner->Mesh1P->PlayAnimation(FireAnimation[1], false);
+			UE_LOG(LogTemp, Warning, TEXT("PrimaryAmmo:%d ReserveAmmo:%d"), PrimaryAmmo, ReserveAmmo);
 			PrimaryAmmo--;
 		}
 	}
@@ -73,11 +75,13 @@ void AWeapon_Base::WeaponReload()
 		if (ReserveAmmo >= 0)
 		{
 			PrimaryAmmo = WeaponConfig.PrimaryClipSize;
+			UE_LOG(LogTemp, Warning, TEXT("PrimaryAmmo:% dReserveAmmo:%d"), PrimaryAmmo, ReserveAmmo);
 		}
 		else
 		{
 			PrimaryAmmo = WeaponConfig.PrimaryClipSize - ReserveAmmo;
 			ReserveAmmo = 0;
+			UE_LOG(LogTemp, Warning, TEXT("PrimaryAmmo:% dReserveAmmo:%d"), PrimaryAmmo, ReserveAmmo);
 		}
 		WeaponMesh1P->PlayAnimation(ReloadAnimation[0], false);
 		WeaponOwner->Mesh1P->PlayAnimation(ReloadAnimation[1], false);
@@ -102,6 +106,8 @@ void AWeapon_Base::WeaponDrop()
 {
 	AItem_Pickup *PickupClass = GetWorld()->SpawnActor<AItem_Pickup>(PickupBlueprint, GetActorTransform());
 	PickupClass->ItemMesh->AddImpulse(WeaponOwner->FPSCamera->GetForwardVector() * 300, NAME_None, true);
+	PickupClass->PrimaryAmmo = PrimaryAmmo;
+	PickupClass->ReserveAmmo = ReserveAmmo;
 	WeaponOwner->CurrentWeapon = nullptr;
 	WeaponOwner->Mesh1P->PlayAnimation(nullptr, false);
 	Destroy();

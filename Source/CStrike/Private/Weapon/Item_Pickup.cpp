@@ -50,6 +50,8 @@ void AItem_Pickup::OverlapHandler(UPrimitiveComponent *OverlappedComponent, AAct
 		FActorSpawnParameters SpawnParameters;
 		AWeapon_Base *ItemBP = GetWorld()->SpawnActor<AWeapon_Base>(ItemBlueprint, Player->GetActorTransform(), SpawnParameters);
 		ItemBP->WeaponDraw(Player);
+		ItemBP->PrimaryAmmo = PrimaryAmmo;
+		ItemBP->ReserveAmmo = ReserveAmmo;
 		this->Destroy();
 	}
 }
