@@ -47,11 +47,39 @@ void AItem_Pickup::OverlapHandler(UPrimitiveComponent *OverlappedComponent, AAct
 	if (OtherActor->IsA<ACSPlayer>())
 	{
 		ACSPlayer *Player = Cast<ACSPlayer>(OtherActor);
-		FActorSpawnParameters SpawnParameters;
-		AWeapon_Base *ItemBP = GetWorld()->SpawnActor<AWeapon_Base>(ItemBlueprint, Player->GetActorTransform(), SpawnParameters);
-		ItemBP->WeaponDraw(Player);
-		ItemBP->PrimaryAmmo = PrimaryAmmo;
-		ItemBP->ReserveAmmo = ReserveAmmo;
-		this->Destroy();
+		if (Player->IsSwitchToNewWeapon)
+		{
+			AWeapon_Base *ItemBP = GetWorld()->SpawnActor<AWeapon_Base>(ItemBlueprint, Player->GetActorTransform());
+			switch (ItemBP->WeaponType)
+			{
+			case Pistol:
+				if (!Player->WeaponSlot[1])
+				{
+					ItemBP->WeaponDraw(Player);
+					ItemBP->PrimaryAmmo = PrimaryAmmo;
+					ItemBP->ReserveAmmo = ReserveAmmo;
+					Player->WeaponSlot[1] = ItemBP;
+					this->Destroy();
+				}
+				break;
+			case SubMachineGun:
+			case ShotGun:
+			case MachineGun:
+			case Rifle:
+			case SniperRifle:
+				if (!Player->WeaponSlot[0])
+				{
+					ItemBP->WeaponDraw(Player);
+					ItemBP->PrimaryAmmo = PrimaryAmmo;
+					ItemBP->ReserveAmmo = ReserveAmmo;
+					Player->WeaponSlot[0] = ItemBP;
+					this->Destroy();
+				}
+			default:
+				break;
+			}
+			if (!ItemBP->WeaponOwner)
+				ItemBP->Destroy();
+		}
 	}
 }

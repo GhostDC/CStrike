@@ -53,8 +53,8 @@ void AWeapon_Base::WeaponPrimaryFire()
 		{
 			WeaponMesh1P->PlayAnimation(FireAnimation[0], false);
 			WeaponOwner->Mesh1P->PlayAnimation(FireAnimation[1], false);
-			UE_LOG(LogTemp, Warning, TEXT("PrimaryAmmo:%d ReserveAmmo:%d"), PrimaryAmmo, ReserveAmmo);
 			PrimaryAmmo--;
+			UE_LOG(LogTemp, Warning, TEXT("PrimaryAmmo:%d ReserveAmmo:%d"), PrimaryAmmo, ReserveAmmo);
 		}
 	}
 }
@@ -71,20 +71,30 @@ void AWeapon_Base::WeaponReload()
 	if (WeaponOwner && !(WeaponType == EWeaponType::Knife || WeaponType == EWeaponType::C4 || WeaponType == EWeaponType::Grenade))
 	{
 		UE_LOG(LogTemp, Log, TEXT("Weapon Reload"));
-		ReserveAmmo -= WeaponConfig.PrimaryClipSize - PrimaryAmmo;
-		if (ReserveAmmo >= 0)
+		if (ReserveAmmo > WeaponConfig.PrimaryClipSize)
 		{
+			ReserveAmmo -= (WeaponConfig.PrimaryClipSize - PrimaryAmmo);
 			PrimaryAmmo = WeaponConfig.PrimaryClipSize;
-			UE_LOG(LogTemp, Warning, TEXT("PrimaryAmmo:% dReserveAmmo:%d"), PrimaryAmmo, ReserveAmmo);
+			WeaponMesh1P->PlayAnimation(ReloadAnimation[0], false);
+			WeaponOwner->Mesh1P->PlayAnimation(ReloadAnimation[1], false);
+			UE_LOG(LogTemp, Warning, TEXT("PrimaryAmmo:%d ReserveAmmo:%d"), PrimaryAmmo, ReserveAmmo);
+		}
+		else if (ReserveAmmo < WeaponConfig.PrimaryClipSize && ReserveAmmo > 0)
+		{
+			PrimaryAmmo = ReserveAmmo;
+			ReserveAmmo = 0;
+			WeaponMesh1P->PlayAnimation(ReloadAnimation[0], false);
+			WeaponOwner->Mesh1P->PlayAnimation(ReloadAnimation[1], false);
+			UE_LOG(LogTemp, Warning, TEXT("PrimaryAmmo:%d ReserveAmmo:%d"), PrimaryAmmo, ReserveAmmo);
+		}
+		else if (PrimaryAmmo == WeaponConfig.PrimaryClipSize)
+		{
+			UE_LOG(LogTemp, Warning, TEXT("No need to reload"));
 		}
 		else
 		{
-			PrimaryAmmo = WeaponConfig.PrimaryClipSize - ReserveAmmo;
-			ReserveAmmo = 0;
-			UE_LOG(LogTemp, Warning, TEXT("PrimaryAmmo:% dReserveAmmo:%d"), PrimaryAmmo, ReserveAmmo);
+			UE_LOG(LogTemp, Warning, TEXT("No ammo can be reload"));
 		}
-		WeaponMesh1P->PlayAnimation(ReloadAnimation[0], false);
-		WeaponOwner->Mesh1P->PlayAnimation(ReloadAnimation[1], false);
 	}
 }
 
@@ -104,13 +114,18 @@ void AWeapon_Base::WeaponDraw(ACSPlayer *DrawPlayer)
 // Called player drop weapon and spawn a pick up blueprint for weapon
 void AWeapon_Base::WeaponDrop()
 {
-	AItem_Pickup *PickupClass = GetWorld()->SpawnActor<AItem_Pickup>(PickupBlueprint, GetActorTransform());
-	PickupClass->ItemMesh->AddImpulse(WeaponOwner->FPSCamera->GetForwardVector() * 300, NAME_None, true);
-	PickupClass->PrimaryAmmo = PrimaryAmmo;
-	PickupClass->ReserveAmmo = ReserveAmmo;
-	WeaponOwner->CurrentWeapon = nullptr;
-	WeaponOwner->Mesh1P->PlayAnimation(nullptr, false);
-	Destroy();
+	int32 WeaponIndex;
+	if (WeaponOwner->WeaponSlot.Find(this, WeaponIndex))
+	{
+		AItem_Pickup *PickupClass = GetWorld()->SpawnActor<AItem_Pickup>(PickupBlueprint, GetActorTransform());
+		WeaponOwner->WeaponSlot[WeaponIndex] = nullptr;
+		PickupClass->ItemMesh->AddImpulse(WeaponOwner->FPSCamera->GetForwardVector() * 300, NAME_None, true);
+		PickupClass->PrimaryAmmo = PrimaryAmmo;
+		PickupClass->ReserveAmmo = ReserveAmmo;
+		WeaponOwner->CurrentWeapon = nullptr;
+		WeaponOwner->Mesh1P->PlayAnimation(nullptr, false);
+		Destroy();
+	}
 }
 
 // Called player want to inspect weapon

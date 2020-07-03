@@ -31,13 +31,21 @@ public:
 	UPROPERTY(VisibleAnywhere, Category = "Weapon")
 	AWeapon_Base *CurrentWeapon;
 
-	// Catch ray trace hit result
-	UPROPERTY()
-	FHitResult HitResult;
-
 	// Set ray trace range
 	UPROPERTY(EditAnywhere, Category = "Config")
 	float TraceRange = 3000.0f;
+
+	// Weapon slot
+	UPROPERTY(EditAnywhere, Category = "Config")
+	TArray<AWeapon_Base *> WeaponSlot;
+
+	// Auto swich new weapon
+	UPROPERTY()
+	bool IsSwitchToNewWeapon = true;
+
+	// Catch ray trace hit result
+	UPROPERTY()
+	FHitResult HitResult;
 
 protected:
 	// Called when the game starts or when spawned
