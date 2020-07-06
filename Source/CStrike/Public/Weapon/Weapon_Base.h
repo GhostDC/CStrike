@@ -9,6 +9,7 @@
 class ACSPlayer;
 class AItem_Pickup;
 class UAnimationAsset;
+class UStaticMeshComponent;
 class USkeletalMeshComponent;
 
 // Setup weapon data
@@ -64,6 +65,10 @@ public:
 	// Sets default values for this actor's properties
 	AWeapon_Base();
 
+	// Set weapon drop mesh
+	UPROPERTY(VisibleAnywhere, Category = "Mesh")
+	UStaticMeshComponent* WeaponDropMesh;
+
 	// Set weapon first person mesh
 	UPROPERTY(VisibleAnywhere, Category = "Mesh")
 	USkeletalMeshComponent *WeaponMesh1P;
@@ -71,10 +76,6 @@ public:
 	// Set weapon third person mesh
 	UPROPERTY(VisibleAnywhere, Category = "Mesh")
 	USkeletalMeshComponent *WeaponMesh3P;
-
-	// Set weapon pick up blueprint after drop
-	UPROPERTY(EditAnywhere, Category = "Pickup")
-	TSubclassOf<AItem_Pickup> PickupBlueprint;
 
 	// Weapon owner
 	UPROPERTY(EditAnywhere, Category = "Owner")
@@ -105,9 +106,12 @@ public:
 	TArray<UAnimationAsset *> InspectAnimation;
 
 	// WeaponAmmo
-	int32 PrimaryAmmo;
+	int32 PrimaryAmmo = -1;
 
-	int32 ReserveAmmo;
+	int32 ReserveAmmo = -1;
+
+	// Weapon spawn time
+	int32 SpawnTime;
 
 protected:
 	// Called when the game starts or when spawned
@@ -117,6 +121,10 @@ protected:
 public:
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
+
+	// Called when player overlap
+	UFUNCTION()
+	void WeaponOverlapHandler(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
 
 	// Called when weapon primary fire
 	UFUNCTION(BlueprintCallable, Category = "Action")

@@ -4,6 +4,7 @@
 #include "Player/CSPlayer.h"
 #include "Weapon/Item_Pickup.h"
 #include "Camera/CameraComponent.h"
+#include "Components/StaticMeshComponent.h"
 #include "Components/SkeletalMeshComponent.h"
 
 // Sets default values
@@ -12,13 +13,21 @@ AWeapon_Base::AWeapon_Base()
 	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
 
+	WeaponDropMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("WeaponDropMesh"));
+	WeaponDropMesh->SetSimulatePhysics(true);
+	WeaponDropMesh->SetGenerateOverlapEvents(false);
+	WeaponDropMesh->OnComponentBeginOverlap.AddDynamic(this, &AWeapon_Base::WeaponOverlapHandler);
+	RootComponent = WeaponDropMesh;
+
+
 	// Set weapon first mesh
 	WeaponMesh1P = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("WeaponMesh1P"));
-	WeaponMesh1P->SetCastShadow(false);
-	RootComponent = WeaponMesh1P;
+	WeaponMesh1P->bOnlyOwnerSee = true;
+	WeaponMesh1P->SetupAttachment(RootComponent);
 
 	// Set weapon third mesh
 	WeaponMesh3P = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("WeaponMesh3P"));
+	WeaponMesh3P->bOwnerNoSee = true;
 	WeaponMesh3P->SetupAttachment(RootComponent);
 }
 
@@ -26,15 +35,34 @@ AWeapon_Base::AWeapon_Base()
 void AWeapon_Base::BeginPlay()
 {
 	Super::BeginPlay();
-
-	PrimaryAmmo = WeaponConfig.PrimaryClipSize;
-	ReserveAmmo = WeaponConfig.ReserveAmmoMax;
+	SpawnTime = FPlatformTime::Seconds();
+	if (PrimaryAmmo == -1 && ReserveAmmo == -1)
+	{
+		PrimaryAmmo = WeaponConfig.PrimaryClipSize;
+		ReserveAmmo = WeaponConfig.ReserveAmmoMax;
+	}
 }
 
 // Called every frame
 void AWeapon_Base::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
+	if (FPlatformTime::Seconds() - SpawnTime >= 1.5f)
+	{
+		WeaponDropMesh->SetGenerateOverlapEvents(true);
+	}
+}
+
+void AWeapon_Base::WeaponOverlapHandler(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
+{
+	if (OtherActor->IsA<ACSPlayer>())
+	{
+		ACSPlayer* OverlapActor = Cast<ACSPlayer>(OtherActor);
+		if (OverlapActor)
+		{
+			WeaponDraw(OverlapActor);
+		}
+	}
 }
 
 // Called when weapon primary fire
@@ -99,15 +127,22 @@ void AWeapon_Base::WeaponReload()
 }
 
 // Called when player equip this weapon
-void AWeapon_Base::WeaponDraw(ACSPlayer *DrawPlayer)
+void AWeapon_Base::WeaponDraw(ACSPlayer* DrawPlayer)
 {
 	if (DrawPlayer)
 	{
-		WeaponOwner = DrawPlayer;
-		this->AttachToComponent(WeaponOwner->Mesh1P, FAttachmentTransformRules::SnapToTargetIncludingScale, TEXT("WeaponSocket"));
-		WeaponOwner->CurrentWeapon = this;
-		WeaponMesh1P->PlayAnimation(DrawAnimation[0], false);
-		WeaponOwner->Mesh1P->PlayAnimation(DrawAnimation[1], false);
+		if (this->WeaponType == EWeaponType::Pistol && !DrawPlayer->WeaponSlot[1])
+		{
+			WeaponOwner = DrawPlayer;
+			WeaponDropMesh->SetSimulatePhysics(false);
+			this->AttachToActor(WeaponOwner,FAttachmentTransformRules::SnapToTargetIncludingScale);
+			WeaponMesh1P->AttachToComponent(WeaponOwner->Mesh1P, FAttachmentTransformRules::SnapToTargetIncludingScale, TEXT("WeaponSocket"));
+			WeaponDropMesh->SetVisibility(false);
+			WeaponOwner->CurrentWeapon = this;
+			WeaponOwner->WeaponSlot[1] = this;
+			WeaponMesh1P->PlayAnimation(DrawAnimation[0], false);
+			WeaponOwner->Mesh1P->PlayAnimation(DrawAnimation[1], false);
+		}
 	}
 }
 
@@ -117,14 +152,18 @@ void AWeapon_Base::WeaponDrop()
 	int32 WeaponIndex;
 	if (WeaponOwner->WeaponSlot.Find(this, WeaponIndex))
 	{
-		AItem_Pickup *PickupClass = GetWorld()->SpawnActor<AItem_Pickup>(PickupBlueprint, GetActorTransform());
+		WeaponDropMesh->SetGenerateOverlapEvents(false);
+		SpawnTime = FPlatformTime::Seconds();
+		this->DetachFromActor(FDetachmentTransformRules::KeepRelativeTransform);
+		WeaponMesh1P->DetachFromParent();
+		WeaponMesh3P->DetachFromParent();
+		WeaponDropMesh->SetSimulatePhysics(true);
+		WeaponDropMesh->SetVisibility(true);
 		WeaponOwner->WeaponSlot[WeaponIndex] = nullptr;
-		PickupClass->ItemMesh->AddImpulse(WeaponOwner->FPSCamera->GetForwardVector() * 300, NAME_None, true);
-		PickupClass->PrimaryAmmo = PrimaryAmmo;
-		PickupClass->ReserveAmmo = ReserveAmmo;
 		WeaponOwner->CurrentWeapon = nullptr;
 		WeaponOwner->Mesh1P->PlayAnimation(nullptr, false);
-		Destroy();
+		WeaponDropMesh->AddImpulse(WeaponOwner->FPSCamera->GetForwardVector() * 300.0f, NAME_None, true);
+		WeaponOwner = nullptr;
 	}
 }
 
