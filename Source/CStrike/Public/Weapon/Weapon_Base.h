@@ -35,6 +35,9 @@ public:
 	int32 WeaponPrice;
 
 	UPROPERTY(EditAnywhere, Category = "Config")
+	float ShotRange;
+
+	UPROPERTY(EditAnywhere, Category = "Config")
 	float CycleTime;
 
 	UPROPERTY(EditAnywhere, Category = "Config")
@@ -105,6 +108,8 @@ public:
 	UPROPERTY(EditAnywhere, Category = "Animation")
 	TArray<UAnimationAsset *> InspectAnimation;
 
+	TArray<FHitResult> HitResults;
+
 	// WeaponAmmo
 	int32 PrimaryAmmo = -1;
 
@@ -112,6 +117,12 @@ public:
 
 	// Weapon spawn time
 	int32 SpawnTime;
+
+	FTimerHandle ReloadTimer;
+
+	FTimerHandle ClipInTimer;
+
+	FTimerHandle FireTimer;
 
 protected:
 	// Called when the game starts or when spawned
@@ -149,4 +160,8 @@ public:
 	// Called when player want inspect weapon
 	UFUNCTION(BlueprintCallable, Category = "Action")
 	void WeaponInspect();
+
+	// Called when weapon per shot
+	UFUNCTION(BlueprintCallable, Category = "Action")
+	void WeaponTracePerShot();
 };

@@ -2,7 +2,7 @@
 
 #include "Weapon/Weapon_Base.h"
 #include "Player/CSPlayer.h"
-#include "Weapon/Item_Pickup.h"
+#include "DrawDebugHelpers.h"
 #include "Camera/CameraComponent.h"
 #include "Components/StaticMeshComponent.h"
 #include "Components/SkeletalMeshComponent.h"
@@ -19,9 +19,9 @@ AWeapon_Base::AWeapon_Base()
 	WeaponDropMesh->OnComponentBeginOverlap.AddDynamic(this, &AWeapon_Base::WeaponOverlapHandler);
 	RootComponent = WeaponDropMesh;
 
-
 	// Set weapon first mesh
 	WeaponMesh1P = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("WeaponMesh1P"));
+	WeaponMesh1P->CastShadow = false;
 	WeaponMesh1P->bOnlyOwnerSee = true;
 	WeaponMesh1P->SetupAttachment(RootComponent);
 
@@ -47,17 +47,17 @@ void AWeapon_Base::BeginPlay()
 void AWeapon_Base::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
-	if (FPlatformTime::Seconds() - SpawnTime >= 1.5f)
+	if (FPlatformTime::Seconds() - SpawnTime >= 1.0f)
 	{
 		WeaponDropMesh->SetGenerateOverlapEvents(true);
 	}
 }
 
-void AWeapon_Base::WeaponOverlapHandler(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
+void AWeapon_Base::WeaponOverlapHandler(UPrimitiveComponent *OverlappedComponent, AActor *OtherActor, UPrimitiveComponent *OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult &SweepResult)
 {
 	if (OtherActor->IsA<ACSPlayer>())
 	{
-		ACSPlayer* OverlapActor = Cast<ACSPlayer>(OtherActor);
+		ACSPlayer *OverlapActor = Cast<ACSPlayer>(OtherActor);
 		if (OverlapActor)
 		{
 			WeaponDraw(OverlapActor);
@@ -82,6 +82,14 @@ void AWeapon_Base::WeaponPrimaryFire()
 			WeaponMesh1P->PlayAnimation(FireAnimation[0], false);
 			WeaponOwner->Mesh1P->PlayAnimation(FireAnimation[1], false);
 			PrimaryAmmo--;
+			WeaponTracePerShot();
+			if (HitResults.Num()>0)
+			{
+				for (int32 i = 0; i < HitResults.Num(); ++i)
+				{
+					UE_LOG(LogTemp,Warning,TEXT("you just hit : %s"), *HitResults[i].GetActor()->GetName());
+				}
+			}
 			UE_LOG(LogTemp, Warning, TEXT("PrimaryAmmo:%d ReserveAmmo:%d"), PrimaryAmmo, ReserveAmmo);
 		}
 	}
@@ -127,17 +135,18 @@ void AWeapon_Base::WeaponReload()
 }
 
 // Called when player equip this weapon
-void AWeapon_Base::WeaponDraw(ACSPlayer* DrawPlayer)
+void AWeapon_Base::WeaponDraw(ACSPlayer *DrawPlayer)
 {
 	if (DrawPlayer)
 	{
 		if (this->WeaponType == EWeaponType::Pistol && !DrawPlayer->WeaponSlot[1])
 		{
+			this->SetOwner(DrawPlayer);
 			WeaponOwner = DrawPlayer;
-			WeaponDropMesh->SetSimulatePhysics(false);
-			this->AttachToActor(WeaponOwner,FAttachmentTransformRules::SnapToTargetIncludingScale);
-			WeaponMesh1P->AttachToComponent(WeaponOwner->Mesh1P, FAttachmentTransformRules::SnapToTargetIncludingScale, TEXT("WeaponSocket"));
 			WeaponDropMesh->SetVisibility(false);
+			WeaponDropMesh->SetSimulatePhysics(false);
+			this->AttachToActor(WeaponOwner, FAttachmentTransformRules::SnapToTargetIncludingScale);
+			WeaponMesh1P->AttachToComponent(WeaponOwner->Mesh1P, FAttachmentTransformRules::SnapToTargetIncludingScale, TEXT("WeaponSocket"));
 			WeaponOwner->CurrentWeapon = this;
 			WeaponOwner->WeaponSlot[1] = this;
 			WeaponMesh1P->PlayAnimation(DrawAnimation[0], false);
@@ -155,15 +164,16 @@ void AWeapon_Base::WeaponDrop()
 		WeaponDropMesh->SetGenerateOverlapEvents(false);
 		SpawnTime = FPlatformTime::Seconds();
 		this->DetachFromActor(FDetachmentTransformRules::KeepRelativeTransform);
-		WeaponMesh1P->DetachFromParent();
-		WeaponMesh3P->DetachFromParent();
+		WeaponMesh1P->DetachFromComponent(FDetachmentTransformRules::KeepRelativeTransform);
+		WeaponMesh3P->DetachFromComponent(FDetachmentTransformRules::KeepRelativeTransform);
 		WeaponDropMesh->SetSimulatePhysics(true);
 		WeaponDropMesh->SetVisibility(true);
 		WeaponOwner->WeaponSlot[WeaponIndex] = nullptr;
 		WeaponOwner->CurrentWeapon = nullptr;
 		WeaponOwner->Mesh1P->PlayAnimation(nullptr, false);
-		WeaponDropMesh->AddImpulse(WeaponOwner->FPSCamera->GetForwardVector() * 300.0f, NAME_None, true);
+		WeaponDropMesh->AddImpulse(WeaponOwner->FPSCamera->GetForwardVector() * 500.0f, NAME_None, true);
 		WeaponOwner = nullptr;
+		this->SetOwner(nullptr);
 	}
 }
 
@@ -172,4 +182,13 @@ void AWeapon_Base::WeaponInspect()
 {
 	WeaponMesh1P->PlayAnimation(InspectAnimation[0], false);
 	WeaponOwner->Mesh1P->PlayAnimation(InspectAnimation[1], false);
+}
+
+// Called when weapon per shot
+void AWeapon_Base::WeaponTracePerShot()
+{
+	FVector TraceStart = WeaponMesh1P->GetSocketLocation("FlashSocket");
+	FVector TraceEnd = WeaponOwner->FPSCamera->GetComponentLocation()+(WeaponOwner->FPSCamera->GetForwardVector() * WeaponConfig.ShotRange);
+	GetWorld()->LineTraceMultiByChannel(HitResults,TraceStart, TraceEnd, ECC_Visibility);
+	DrawDebugLine(GetWorld(), TraceStart, TraceEnd, FColor::Orange,true,2.0f);
 }
