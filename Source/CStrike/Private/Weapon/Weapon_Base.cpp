@@ -83,11 +83,16 @@ void AWeapon_Base::WeaponPrimaryFire()
 			WeaponOwner->Mesh1P->PlayAnimation(FireAnimation[1], false);
 			PrimaryAmmo--;
 			WeaponTracePerShot();
-			if (HitResults.Num()>0)
+			if (HitResults.Num() > 0)
 			{
-				for (int32 i = 0; i < HitResults.Num(); ++i)
+				for (int32 i = 0; i < HitResults.Num(); i++)
 				{
 					UE_LOG(LogTemp,Warning,TEXT("you just hit : %s"), *HitResults[i].GetActor()->GetName());
+					if (HitResults[i].Actor->IsA<ACSPlayer>())
+					{
+						ACSPlayer* HitPlayer = Cast<ACSPlayer>(HitResults[i].Actor);
+						HitPlayer->ApplyDamage(WeaponConfig.BaseDamage, WeaponConfig.Penetrate);
+					}
 				}
 			}
 			UE_LOG(LogTemp, Warning, TEXT("PrimaryAmmo:%d ReserveAmmo:%d"), PrimaryAmmo, ReserveAmmo);

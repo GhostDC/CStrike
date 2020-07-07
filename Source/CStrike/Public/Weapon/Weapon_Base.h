@@ -23,7 +23,10 @@ public:
 	bool isFullAuto;
 
 	UPROPERTY(EditAnywhere, Category = "Config")
-	int32 baseDamage;
+	float BaseDamage;
+
+	UPROPERTY(EditAnywhere, Category = "Config")
+	float Penetrate;
 
 	UPROPERTY(EditAnywhere, Category = "Config")
 	int32 PrimaryClipSize;

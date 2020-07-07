@@ -39,6 +39,12 @@ public:
 	UPROPERTY(EditAnywhere, Category = "Config")
 	TArray<AWeapon_Base *> WeaponSlot;
 
+	// Setup player health
+	float Health = 100.0f;
+
+	// Setup player ammor
+	float Ammor = 100.0f;
+
 	// Auto swich new weapon
 	UPROPERTY()
 	bool IsSwitchToNewWeapon = true;
@@ -93,4 +99,8 @@ public:
 	// Called when player wants to inspect weapon
 	UFUNCTION(BlueprintCallable, Category = "Action")
 	void PlayerInspect();
+
+	// Called when weapon fire hit player
+	UFUNCTION(BlueprintCallable, Category = "Damage")
+	void ApplyDamage(float BaseDamege, float Penetrate);
 };

@@ -119,3 +119,15 @@ void ACSPlayer::PlayerInspect()
 		CurrentWeapon->WeaponInspect();
 	}
 }
+
+void ACSPlayer::ApplyDamage(float BaseDamage, float Penetrate)
+{
+	if (Ammor == 0)
+	{
+		Health -= BaseDamage;
+		if (Health<=0.0f)
+		{
+			Destroy();
+		}
+	}
+}
