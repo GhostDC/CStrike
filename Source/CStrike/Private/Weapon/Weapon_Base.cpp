@@ -3,6 +3,7 @@
 #include "Weapon/Weapon_Base.h"
 #include "Player/CSPlayer.h"
 #include "DrawDebugHelpers.h"
+#include "CollisionQueryParams.h"
 #include "Camera/CameraComponent.h"
 #include "Kismet/GameplayStatics.h"
 #include "Components/StaticMeshComponent.h"
@@ -69,7 +70,7 @@ void AWeapon_Base::WeaponOverlapHandler(UPrimitiveComponent* OverlappedComponent
 // Called when weapon primary fire
 void AWeapon_Base::WeaponPrimaryFire()
 {
-	if (WeaponOwner)
+	if (WeaponOwner && CanFire)
 	{
 		UE_LOG(LogTemp, Log, TEXT("Weapon primary fire"));
 		if (WeaponType == EWeaponType::Knife)
@@ -80,15 +81,21 @@ void AWeapon_Base::WeaponPrimaryFire()
 		}
 		else if (PrimaryAmmo > 0)
 		{
-			if (WeaponConfig.isBrustFire)
+			if (WeaponConfig.isFullAuto)
 			{
-				for (int32 i = 0; i < WeaponConfig.BrustShotCost; i++)
-				{
-					WeaponInstantFire();
-				}
-
+				GetWorldTimerManager().SetTimer(FireTimer, this, &AWeapon_Base::WeaponInstantFire, WeaponConfig.CycleTime, true, 0.0f);
 			}
-			else WeaponInstantFire();
+			else
+			{
+				if (WeaponConfig.isBrustFire)
+				{
+					for (int32 i = 0; i < WeaponConfig.BrustShotCost; i++)
+					{
+						GetWorldTimerManager().SetTimer(FireTimer, this, &AWeapon_Base::WeaponInstantFire, WeaponConfig.CycleTime, false, 0.0f);
+					}
+				}
+				else WeaponInstantFire();
+			}
 		}
 	}
 }
@@ -106,13 +113,23 @@ void AWeapon_Base::WeaponSecondryFire()
 	}
 }
 
+// Called when player release fire
+void AWeapon_Base::WeaponStopFire()
+{
+	if (GetWorldTimerManager().IsTimerActive(FireTimer))
+	{
+		GetWorldTimerManager().ClearTimer(FireTimer);
+	}
+}
+
+// Called when player want to fire weapon multiple times
 void AWeapon_Base::WeaponInstantFire()
 {
 	WeaponMesh1P->PlayAnimation(FireAnimation[0], false);
 	WeaponOwner->Mesh1P->PlayAnimation(FireAnimation[1], false);
-	PrimaryAmmo--;
-	if (WeaponType == EWeaponType::ShotGun)
+	if (PrimaryAmmo > 0)
 	{
+		PrimaryAmmo--;
 		WeaponTracePerShot();
 		if (HitResults.Num() > 0)
 		{
@@ -123,7 +140,7 @@ void AWeapon_Base::WeaponInstantFire()
 				{
 					ACSPlayer* HitPlayer = Cast<ACSPlayer>(HitResults[i].Actor);
 					TSubclassOf<UDamageType> DamageType;
-					UGameplayStatics::ApplyPointDamage(HitPlayer, WeaponConfig.BaseDamage, GetActorLocation(), HitResults[i], this->GetOwner()->GetInstigatorController(), this, DamageType);
+					UGameplayStatics::ApplyPointDamage(HitPlayer, WeaponConfig.BaseDamage, GetActorLocation(), HitResults[i], WeaponOwner->GetController(), this, DamageType);
 					UE_LOG(LogTemp, Warning, TEXT("%s got shot health : %f"), *HitPlayer->GetFullName(), HitPlayer->Health);
 				}
 			}
@@ -215,11 +232,14 @@ void AWeapon_Base::WeaponInspect()
 	WeaponOwner->Mesh1P->PlayAnimation(InspectAnimation[1], false);
 }
 
+
 // Called when weapon per shot
 void AWeapon_Base::WeaponTracePerShot()
 {
 	FVector TraceStart = WeaponMesh1P->GetSocketLocation("FlashSocket");
 	FVector TraceEnd = WeaponOwner->FPSCamera->GetComponentLocation() + (WeaponOwner->FPSCamera->GetForwardVector() * WeaponConfig.ShotRange);
-	GetWorld()->LineTraceMultiByChannel(HitResults, TraceStart, TraceEnd, ECC_Camera);
+	FCollisionQueryParams CollisionQueryParams;
+	CollisionQueryParams.AddIgnoredActor(WeaponOwner);
+	GetWorld()->LineTraceMultiByChannel(HitResults, TraceStart, TraceEnd, ECC_Camera, CollisionQueryParams);
 	DrawDebugLine(GetWorld(), TraceStart, TraceEnd, FColor::Orange, true, 2.0f);
 }

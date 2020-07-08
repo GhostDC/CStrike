@@ -120,6 +120,8 @@ public:
 	UPROPERTY(EditAnywhere, Category = "Animation")
 	TArray<UAnimationAsset *> InspectAnimation;
 
+	bool CanFire = true;
+
 	TArray<FHitResult> HitResults;
 
 	// WeaponAmmo
@@ -156,6 +158,10 @@ public:
 	// Called when weapon secondry fire
 	UFUNCTION(BlueprintCallable, Category = "Action")
 	void WeaponSecondryFire();
+
+	// Called when player release fire
+	UFUNCTION(BlueprintCallable, Category = "Action")
+	void WeaponStopFire();
 
 	UFUNCTION(BlueprintCallable, Category = "Action")
 	void WeaponInstantFire();
