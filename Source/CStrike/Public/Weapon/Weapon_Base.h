@@ -23,6 +23,12 @@ public:
 	bool isFullAuto;
 
 	UPROPERTY(EditAnywhere, Category = "Config")
+	bool isBrustFire;
+
+	UPROPERTY(EditAnywhere, Category = "Config")
+	int32 BrustShotCost;
+
+	UPROPERTY(EditAnywhere, Category = "Config")
 	float BaseDamage;
 
 	UPROPERTY(EditAnywhere, Category = "Config")
@@ -45,6 +51,9 @@ public:
 
 	UPROPERTY(EditAnywhere, Category = "Config")
 	float Weight;
+
+	UPROPERTY(EditAnywhere, Category = "Config")
+	FName WeaponName;
 };
 
 // Setup weapon type
@@ -147,6 +156,9 @@ public:
 	// Called when weapon secondry fire
 	UFUNCTION(BlueprintCallable, Category = "Action")
 	void WeaponSecondryFire();
+
+	UFUNCTION(BlueprintCallable, Category = "Action")
+	void WeaponInstantFire();
 
 	// Called when weapon reload
 	UFUNCTION(BlueprintCallable, Category = "Action")

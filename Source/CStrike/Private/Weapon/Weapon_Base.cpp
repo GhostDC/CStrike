@@ -4,6 +4,7 @@
 #include "Player/CSPlayer.h"
 #include "DrawDebugHelpers.h"
 #include "Camera/CameraComponent.h"
+#include "Kismet/GameplayStatics.h"
 #include "Components/StaticMeshComponent.h"
 #include "Components/SkeletalMeshComponent.h"
 
@@ -16,7 +17,6 @@ AWeapon_Base::AWeapon_Base()
 	WeaponDropMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("WeaponDropMesh"));
 	WeaponDropMesh->SetSimulatePhysics(true);
 	WeaponDropMesh->SetGenerateOverlapEvents(false);
-	WeaponDropMesh->OnComponentBeginOverlap.AddDynamic(this, &AWeapon_Base::WeaponOverlapHandler);
 	RootComponent = WeaponDropMesh;
 
 	// Set weapon first mesh
@@ -35,6 +35,7 @@ AWeapon_Base::AWeapon_Base()
 void AWeapon_Base::BeginPlay()
 {
 	Super::BeginPlay();
+	WeaponDropMesh->OnComponentBeginOverlap.AddDynamic(this, &AWeapon_Base::WeaponOverlapHandler);
 	SpawnTime = FPlatformTime::Seconds();
 	if (PrimaryAmmo == -1 && ReserveAmmo == -1)
 	{
@@ -53,11 +54,11 @@ void AWeapon_Base::Tick(float DeltaTime)
 	}
 }
 
-void AWeapon_Base::WeaponOverlapHandler(UPrimitiveComponent *OverlappedComponent, AActor *OtherActor, UPrimitiveComponent *OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult &SweepResult)
+void AWeapon_Base::WeaponOverlapHandler(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
 	if (OtherActor->IsA<ACSPlayer>())
 	{
-		ACSPlayer *OverlapActor = Cast<ACSPlayer>(OtherActor);
+		ACSPlayer* OverlapActor = Cast<ACSPlayer>(OtherActor);
 		if (OverlapActor)
 		{
 			WeaponDraw(OverlapActor);
@@ -79,23 +80,15 @@ void AWeapon_Base::WeaponPrimaryFire()
 		}
 		else if (PrimaryAmmo > 0)
 		{
-			WeaponMesh1P->PlayAnimation(FireAnimation[0], false);
-			WeaponOwner->Mesh1P->PlayAnimation(FireAnimation[1], false);
-			PrimaryAmmo--;
-			WeaponTracePerShot();
-			if (HitResults.Num() > 0)
+			if (WeaponConfig.isBrustFire)
 			{
-				for (int32 i = 0; i < HitResults.Num(); i++)
+				for (int32 i = 0; i < WeaponConfig.BrustShotCost; i++)
 				{
-					UE_LOG(LogTemp,Warning,TEXT("you just hit : %s"), *HitResults[i].GetActor()->GetName());
-					if (HitResults[i].Actor->IsA<ACSPlayer>())
-					{
-						ACSPlayer* HitPlayer = Cast<ACSPlayer>(HitResults[i].Actor);
-						HitPlayer->ApplyDamage(WeaponConfig.BaseDamage, WeaponConfig.Penetrate);
-					}
+					WeaponInstantFire();
 				}
+
 			}
-			UE_LOG(LogTemp, Warning, TEXT("PrimaryAmmo:%d ReserveAmmo:%d"), PrimaryAmmo, ReserveAmmo);
+			else WeaponInstantFire();
 		}
 	}
 }
@@ -103,7 +96,40 @@ void AWeapon_Base::WeaponPrimaryFire()
 // Called when weapon secondry fire
 void AWeapon_Base::WeaponSecondryFire()
 {
-	UE_LOG(LogTemp, Log, TEXT("Weapon secondry fire"));
+	if (WeaponConfig.WeaponName == TEXT("glock18") || WeaponConfig.WeaponName == TEXT("famas"))
+	{
+		WeaponConfig.isBrustFire = true;
+	}
+	else if (WeaponType == EWeaponType::SniperRifle)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("Your sniper rifle is scoped"));
+	}
+}
+
+void AWeapon_Base::WeaponInstantFire()
+{
+	WeaponMesh1P->PlayAnimation(FireAnimation[0], false);
+	WeaponOwner->Mesh1P->PlayAnimation(FireAnimation[1], false);
+	PrimaryAmmo--;
+	if (WeaponType == EWeaponType::ShotGun)
+	{
+		WeaponTracePerShot();
+		if (HitResults.Num() > 0)
+		{
+			for (int32 i = 0; i < HitResults.Num(); i++)
+			{
+				UE_LOG(LogTemp, Warning, TEXT("you just hit : %s"), *HitResults[i].GetActor()->GetFullName());
+				if (HitResults[i].Actor->IsA<ACSPlayer>())
+				{
+					ACSPlayer* HitPlayer = Cast<ACSPlayer>(HitResults[i].Actor);
+					TSubclassOf<UDamageType> DamageType;
+					UGameplayStatics::ApplyPointDamage(HitPlayer, WeaponConfig.BaseDamage, GetActorLocation(), HitResults[i], this->GetOwner()->GetInstigatorController(), this, DamageType);
+					UE_LOG(LogTemp, Warning, TEXT("%s got shot health : %f"), *HitPlayer->GetFullName(), HitPlayer->Health);
+				}
+			}
+		}
+		UE_LOG(LogTemp, Warning, TEXT("PrimaryAmmo:%d ReserveAmmo:%d"), PrimaryAmmo, ReserveAmmo);
+	}
 }
 
 // Called when weapon reload
@@ -140,7 +166,7 @@ void AWeapon_Base::WeaponReload()
 }
 
 // Called when player equip this weapon
-void AWeapon_Base::WeaponDraw(ACSPlayer *DrawPlayer)
+void AWeapon_Base::WeaponDraw(ACSPlayer* DrawPlayer)
 {
 	if (DrawPlayer)
 	{
@@ -193,7 +219,7 @@ void AWeapon_Base::WeaponInspect()
 void AWeapon_Base::WeaponTracePerShot()
 {
 	FVector TraceStart = WeaponMesh1P->GetSocketLocation("FlashSocket");
-	FVector TraceEnd = WeaponOwner->FPSCamera->GetComponentLocation()+(WeaponOwner->FPSCamera->GetForwardVector() * WeaponConfig.ShotRange);
-	GetWorld()->LineTraceMultiByChannel(HitResults,TraceStart, TraceEnd, ECC_Visibility);
-	DrawDebugLine(GetWorld(), TraceStart, TraceEnd, FColor::Orange,true,2.0f);
+	FVector TraceEnd = WeaponOwner->FPSCamera->GetComponentLocation() + (WeaponOwner->FPSCamera->GetForwardVector() * WeaponConfig.ShotRange);
+	GetWorld()->LineTraceMultiByChannel(HitResults, TraceStart, TraceEnd, ECC_Camera);
+	DrawDebugLine(GetWorld(), TraceStart, TraceEnd, FColor::Orange, true, 2.0f);
 }

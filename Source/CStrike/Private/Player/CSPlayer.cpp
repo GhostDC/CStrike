@@ -120,14 +120,16 @@ void ACSPlayer::PlayerInspect()
 	}
 }
 
-void ACSPlayer::ApplyDamage(float BaseDamage, float Penetrate)
+float ACSPlayer::TakeDamage(float DamageAmount, struct FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser)
 {
+	Super::TakeDamage(DamageAmount, DamageEvent, EventInstigator, DamageCauser);
 	if (Ammor == 0)
 	{
-		Health -= BaseDamage;
-		if (Health<=0.0f)
+		Health -= DamageAmount;
+		if (Health <= 0.0f)
 		{
-			Destroy();
+			this->Destroy();
 		}
 	}
+	return Health;
 }

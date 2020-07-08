@@ -43,7 +43,7 @@ public:
 	float Health = 100.0f;
 
 	// Setup player ammor
-	float Ammor = 100.0f;
+	float Ammor = 0.0f;
 
 	// Auto swich new weapon
 	UPROPERTY()
@@ -101,6 +101,6 @@ public:
 	void PlayerInspect();
 
 	// Called when weapon fire hit player
-	UFUNCTION(BlueprintCallable, Category = "Damage")
-	void ApplyDamage(float BaseDamege, float Penetrate);
+	//UFUNCTION(BlueprintCallable, Category = "Damage")
+	virtual float TakeDamage(float DamageAmount, struct FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser) override;
 };
