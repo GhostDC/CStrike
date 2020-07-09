@@ -178,6 +178,14 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "Action")
 	void WeaponDrop();
 
+	// Called when need to attach weapon to player
+	UFUNCTION()
+	void AttachWeaponToPlayer();
+
+	// Called when need to detach weapon from player
+	UFUNCTION()
+	void DetachWeaponFromPlayer();
+
 	// Called when player want inspect weapon
 	UFUNCTION(BlueprintCallable, Category = "Action")
 	void WeaponInspect();

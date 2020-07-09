@@ -194,7 +194,7 @@ void AWeapon_Base::WeaponDraw(ACSPlayer* DrawPlayer)
 			WeaponDropMesh->SetVisibility(false);
 			WeaponDropMesh->SetSimulatePhysics(false);
 			this->AttachToActor(WeaponOwner, FAttachmentTransformRules::SnapToTargetIncludingScale);
-			WeaponMesh1P->AttachToComponent(WeaponOwner->Mesh1P, FAttachmentTransformRules::SnapToTargetIncludingScale, TEXT("WeaponSocket"));
+			AttachWeaponToPlayer();
 			WeaponOwner->CurrentWeapon = this;
 			WeaponOwner->WeaponSlot[1] = this;
 			WeaponMesh1P->PlayAnimation(DrawAnimation[0], false);
@@ -212,8 +212,7 @@ void AWeapon_Base::WeaponDrop()
 		WeaponDropMesh->SetGenerateOverlapEvents(false);
 		SpawnTime = FPlatformTime::Seconds();
 		this->DetachFromActor(FDetachmentTransformRules::KeepRelativeTransform);
-		WeaponMesh1P->DetachFromComponent(FDetachmentTransformRules::KeepRelativeTransform);
-		WeaponMesh3P->DetachFromComponent(FDetachmentTransformRules::KeepRelativeTransform);
+		DetachWeaponFromPlayer();
 		WeaponDropMesh->SetSimulatePhysics(true);
 		WeaponDropMesh->SetVisibility(true);
 		WeaponOwner->WeaponSlot[WeaponIndex] = nullptr;
@@ -225,13 +224,30 @@ void AWeapon_Base::WeaponDrop()
 	}
 }
 
+// Called when need to attach weapon to player
+void AWeapon_Base::AttachWeaponToPlayer()
+{
+	if (WeaponOwner)
+	{
+		FName AttachPoint = WeaponOwner->AttachSocket;
+		WeaponMesh1P->AttachToComponent(WeaponOwner->Mesh1P, FAttachmentTransformRules::SnapToTargetIncludingScale, AttachPoint);
+		WeaponMesh3P->AttachToComponent(WeaponOwner->GetMesh(), FAttachmentTransformRules::SnapToTargetIncludingScale, AttachPoint);
+	}
+}
+
+// Called when need to detach weapon from player
+void AWeapon_Base::DetachWeaponFromPlayer()
+{
+	WeaponMesh1P->DetachFromComponent(FDetachmentTransformRules::KeepRelativeTransform);
+	WeaponMesh3P->DetachFromComponent(FDetachmentTransformRules::KeepRelativeTransform);
+}
+
 // Called player want to inspect weapon
 void AWeapon_Base::WeaponInspect()
 {
 	WeaponMesh1P->PlayAnimation(InspectAnimation[0], false);
 	WeaponOwner->Mesh1P->PlayAnimation(InspectAnimation[1], false);
 }
-
 
 // Called when weapon per shot
 void AWeapon_Base::WeaponTracePerShot()

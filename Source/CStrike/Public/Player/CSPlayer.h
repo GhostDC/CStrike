@@ -21,23 +21,23 @@ public:
 
 	// Set first player mesh
 	UPROPERTY(VisibleAnywhere, Category = "Mesh")
-	USkeletalMeshComponent *Mesh1P;
+		USkeletalMeshComponent* Mesh1P;
 
 	// Set first player camera
 	UPROPERTY(VisibleAnywhere, Category = "Camera")
-	UCameraComponent *FPSCamera;
+		UCameraComponent* FPSCamera;
 
 	// Set player weapon slot
 	UPROPERTY(VisibleAnywhere, Category = "Weapon")
-	AWeapon_Base *CurrentWeapon;
+		AWeapon_Base* CurrentWeapon;
 
 	// Set ray trace range
 	UPROPERTY(EditAnywhere, Category = "Config")
-	float TraceRange = 3000.0f;
+		float TraceRange = 3000.0f;
 
 	// Weapon slot
 	UPROPERTY(EditAnywhere, Category = "Config")
-	TArray<AWeapon_Base *> WeaponSlot;
+		TArray<AWeapon_Base*> WeaponSlot;
 
 	// Setup player health
 	float Health = 100.0f;
@@ -53,6 +53,9 @@ public:
 	UPROPERTY()
 	FHitResult HitResult;
 
+	UPROPERTY(EditDefaultsOnly, Category = "Config")
+	FName AttachSocket;
+
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
@@ -63,42 +66,42 @@ public:
 
 	// Called to ray trace per tick
 	UFUNCTION()
-	void RayTracePerTick();
+		void RayTracePerTick();
 
 	// Called to bind functionality to input
-	virtual void SetupPlayerInputComponent(class UInputComponent *PlayerInputComponent) override;
+	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
 	//////////////////////////////////////////////////////
 	// Movement
 	// Called when player wants to move forward
 	UFUNCTION(BlueprintCallable, Category = "Movement")
-	void MoveForward(float Val);
+		void MoveForward(float Val);
 
 	// Called when player wants to move right
 	UFUNCTION(BlueprintCallable, Category = "Movement")
-	void MoveRight(float Val);
+		void MoveRight(float Val);
 
 	//////////////////////////////////////////////////////
 	// Weapon action
 	// Called when player wants to primary fire
 	UFUNCTION(BlueprintCallable, Category = "Action")
-	void PlayerFirePrimary();
+		void PlayerFirePrimary();
 
 	// Called when player wants to secondary fire
 	UFUNCTION(BlueprintCallable, Category = "Action")
-	void PlayerFireSecondary();
+		void PlayerFireSecondary();
 
 	// Called when player wants to reload or when weapon ammo empty and primary fire release
 	UFUNCTION(BlueprintCallable, Category = "Action")
-	void PlayerReload();
+		void PlayerReload();
 
 	// Called when player wants to drop item
 	UFUNCTION(BlueprintCallable, Category = "Action")
-	void PlayerDrop();
+		void PlayerDrop();
 
 	// Called when player wants to inspect weapon
 	UFUNCTION(BlueprintCallable, Category = "Action")
-	void PlayerInspect();
+		void PlayerInspect();
 
 	// Called when weapon fire hit player
 	//UFUNCTION(BlueprintCallable, Category = "Damage")
