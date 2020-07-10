@@ -70,7 +70,7 @@ void AWeapon_Base::WeaponOverlapHandler(UPrimitiveComponent* OverlappedComponent
 // Called when weapon primary fire
 void AWeapon_Base::WeaponPrimaryFire()
 {
-	if (WeaponOwner && CanFire)
+	if (CanFire())
 	{
 		UE_LOG(LogTemp, Log, TEXT("Weapon primary fire"));
 		if (WeaponType == EWeaponType::Knife)
@@ -152,7 +152,7 @@ void AWeapon_Base::WeaponInstantFire()
 // Called when weapon reload
 void AWeapon_Base::WeaponReload()
 {
-	if (WeaponOwner && !(WeaponType == EWeaponType::Knife || WeaponType == EWeaponType::C4 || WeaponType == EWeaponType::Grenade))
+	if (CanReload() && !(WeaponType == EWeaponType::Knife || WeaponType == EWeaponType::C4 || WeaponType == EWeaponType::Grenade))
 	{
 		UE_LOG(LogTemp, Log, TEXT("Weapon Reload"));
 		if (ReserveAmmo > WeaponConfig.PrimaryClipSize)
@@ -165,11 +165,22 @@ void AWeapon_Base::WeaponReload()
 		}
 		else if (ReserveAmmo < WeaponConfig.PrimaryClipSize && ReserveAmmo > 0)
 		{
-			PrimaryAmmo = ReserveAmmo;
-			ReserveAmmo = 0;
-			WeaponMesh1P->PlayAnimation(ReloadAnimation[0], false);
-			WeaponOwner->Mesh1P->PlayAnimation(ReloadAnimation[1], false);
-			UE_LOG(LogTemp, Warning, TEXT("PrimaryAmmo:%d ReserveAmmo:%d"), PrimaryAmmo, ReserveAmmo);
+			if (WeaponConfig.PrimaryClipSize - PrimaryAmmo > 0)
+			{
+				ReserveAmmo -= (WeaponConfig.PrimaryClipSize - PrimaryAmmo);
+				PrimaryAmmo = WeaponConfig.PrimaryClipSize;
+				WeaponMesh1P->PlayAnimation(ReloadAnimation[0], false);
+				WeaponOwner->Mesh1P->PlayAnimation(ReloadAnimation[1], false);
+				UE_LOG(LogTemp, Warning, TEXT("PrimaryAmmo:%d ReserveAmmo:%d"), PrimaryAmmo, ReserveAmmo);
+			}
+			else
+			{
+				PrimaryAmmo = ReserveAmmo;
+				ReserveAmmo = 0;
+				WeaponMesh1P->PlayAnimation(ReloadAnimation[0], false);
+				WeaponOwner->Mesh1P->PlayAnimation(ReloadAnimation[1], false);
+				UE_LOG(LogTemp, Warning, TEXT("PrimaryAmmo:%d ReserveAmmo:%d"), PrimaryAmmo, ReserveAmmo);
+			}
 		}
 		else if (PrimaryAmmo == WeaponConfig.PrimaryClipSize)
 		{
@@ -258,4 +269,16 @@ void AWeapon_Base::WeaponTracePerShot()
 	CollisionQueryParams.AddIgnoredActor(WeaponOwner);
 	GetWorld()->LineTraceMultiByChannel(HitResults, TraceStart, TraceEnd, ECC_Camera, CollisionQueryParams);
 	DrawDebugLine(GetWorld(), TraceStart, TraceEnd, FColor::Orange, true, 2.0f);
+}
+
+// Check weapon can fire or not before weapon fire
+bool AWeapon_Base::CanFire()
+{
+	return (WeaponOwner && PrimaryAmmo > 0);
+}
+
+// Check weapon can reload or not before weapon reload
+bool AWeapon_Base::CanReload()
+{
+	return (WeaponOwner && PrimaryAmmo != WeaponConfig.PrimaryClipSize && ReserveAmmo > 0);
 }

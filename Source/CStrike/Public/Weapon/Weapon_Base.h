@@ -120,8 +120,6 @@ public:
 	UPROPERTY(EditAnywhere, Category = "Animation")
 	TArray<UAnimationAsset *> InspectAnimation;
 
-	bool CanFire = true;
-
 	TArray<FHitResult> HitResults;
 
 	// WeaponAmmo
@@ -193,4 +191,10 @@ public:
 	// Called when weapon per shot
 	UFUNCTION(BlueprintCallable, Category = "Action")
 	void WeaponTracePerShot();
+
+	// Check weapon can fire or not before weapon fire
+	bool CanFire();
+
+	// Check weapon can reload or not before weapon reload
+	bool CanReload();
 };
