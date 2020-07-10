@@ -120,6 +120,19 @@ void ACSPlayer::PlayerInspect()
 	}
 }
 
+// Called when player want to pickup weapon
+void ACSPlayer::PlayerPickup()
+{
+	if (HitResult.bBlockingHit && HitResult.Distance < PickupRange)
+	{
+		AWeapon_Base* Weapon = Cast<AWeapon_Base>(HitResult.Actor);
+		if (Weapon)
+		{
+			Weapon->WeaponDraw(this);
+		}
+	}
+}
+
 float ACSPlayer::TakeDamage(float DamageAmount, struct FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser)
 {
 	Super::TakeDamage(DamageAmount, DamageEvent, EventInstigator, DamageCauser);

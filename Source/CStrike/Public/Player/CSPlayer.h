@@ -21,29 +21,33 @@ public:
 
 	// Set first player mesh
 	UPROPERTY(VisibleAnywhere, Category = "Mesh")
-		USkeletalMeshComponent* Mesh1P;
+	USkeletalMeshComponent* Mesh1P;
 
 	// Set first player camera
 	UPROPERTY(VisibleAnywhere, Category = "Camera")
-		UCameraComponent* FPSCamera;
+	UCameraComponent* FPSCamera;
 
 	// Set player weapon slot
 	UPROPERTY(VisibleAnywhere, Category = "Weapon")
-		AWeapon_Base* CurrentWeapon;
+	AWeapon_Base* CurrentWeapon;
 
 	// Set ray trace range
 	UPROPERTY(EditAnywhere, Category = "Config")
-		float TraceRange = 3000.0f;
+	float TraceRange = 3000.0f;
 
 	// Weapon slot
 	UPROPERTY(EditAnywhere, Category = "Config")
-		TArray<AWeapon_Base*> WeaponSlot;
+	TArray<AWeapon_Base*> WeaponSlot;
 
 	// Setup player health
 	float Health = 100.0f;
 
 	// Setup player ammor
 	float Ammor = 0.0f;
+
+	// Set player pick up range
+	UPROPERTY(EditAnywhere, Category = "Config")
+	float PickupRange = 200.0f;
 
 	// Auto swich new weapon
 	UPROPERTY()
@@ -102,6 +106,10 @@ public:
 	// Called when player wants to inspect weapon
 	UFUNCTION(BlueprintCallable, Category = "Action")
 		void PlayerInspect();
+
+	// Called when player want to pickup weapon
+	UFUNCTION(BlueprintCallable, Category = "Action")
+	void PlayerPickup();
 
 	// Called when weapon fire hit player
 	//UFUNCTION(BlueprintCallable, Category = "Damage")

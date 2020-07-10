@@ -198,13 +198,14 @@ void AWeapon_Base::WeaponDraw(ACSPlayer* DrawPlayer)
 {
 	if (DrawPlayer)
 	{
-		if (this->WeaponType == EWeaponType::Pistol && !DrawPlayer->WeaponSlot[1])
+		if (WeaponType == EWeaponType::Pistol && !DrawPlayer->WeaponSlot[1])
 		{
-			this->SetOwner(DrawPlayer);
+			SetOwner(DrawPlayer);
 			WeaponOwner = DrawPlayer;
 			WeaponDropMesh->SetVisibility(false);
 			WeaponDropMesh->SetSimulatePhysics(false);
-			this->AttachToActor(WeaponOwner, FAttachmentTransformRules::SnapToTargetIncludingScale);
+			WeaponDropMesh->SetGenerateOverlapEvents(false);
+			AttachToActor(WeaponOwner, FAttachmentTransformRules::SnapToTargetIncludingScale);
 			AttachWeaponToPlayer();
 			WeaponOwner->CurrentWeapon = this;
 			WeaponOwner->WeaponSlot[1] = this;
