@@ -97,6 +97,14 @@ void ACSPlayer::PlayerFireSecondary()
 		CurrentWeapon->WeaponSecondryFire();
 }
 
+void ACSPlayer::PlayerStopFire()
+{
+	if (CurrentWeapon)
+	{
+		CurrentWeapon->WeaponStopFire();
+	}
+}
+
 // Called when player wants to reload
 void ACSPlayer::PlayerReload()
 {

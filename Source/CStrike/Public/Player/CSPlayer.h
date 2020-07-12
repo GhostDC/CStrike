@@ -95,6 +95,10 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "Action")
 		void PlayerFireSecondary();
 
+	// Called when player release fire button
+	UFUNCTION(BlueprintCallable, Category = "Action")
+		void PlayerStopFire();
+
 	// Called when player wants to reload or when weapon ammo empty and primary fire release
 	UFUNCTION(BlueprintCallable, Category = "Action")
 		void PlayerReload();

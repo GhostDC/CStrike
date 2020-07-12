@@ -151,7 +151,7 @@ public:
 
 	// Called when weapon primary fire
 	UFUNCTION(BlueprintCallable, Category = "Action")
-	void WeaponPrimaryFire();
+	virtual void WeaponPrimaryFire();
 
 	// Called when weapon secondry fire
 	UFUNCTION(BlueprintCallable, Category = "Action")
@@ -159,7 +159,7 @@ public:
 
 	// Called when player release fire
 	UFUNCTION(BlueprintCallable, Category = "Action")
-	void WeaponStopFire();
+	virtual void WeaponStopFire();
 
 	UFUNCTION(BlueprintCallable, Category = "Action")
 	void WeaponInstantFire();
