@@ -155,7 +155,7 @@ public:
 
 	// Called when weapon secondry fire
 	UFUNCTION(BlueprintCallable, Category = "Action")
-	void WeaponSecondryFire();
+	virtual void WeaponSecondaryFire();
 
 	// Called when player release fire
 	UFUNCTION(BlueprintCallable, Category = "Action")

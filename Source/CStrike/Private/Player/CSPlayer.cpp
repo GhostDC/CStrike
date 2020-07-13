@@ -94,7 +94,7 @@ void ACSPlayer::PlayerFirePrimary()
 void ACSPlayer::PlayerFireSecondary()
 {
 	if (CurrentWeapon)
-		CurrentWeapon->WeaponSecondryFire();
+		CurrentWeapon->WeaponSecondaryFire();
 }
 
 void ACSPlayer::PlayerStopFire()

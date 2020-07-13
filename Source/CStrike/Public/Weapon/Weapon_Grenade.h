@@ -9,6 +9,7 @@
 class USphereComponent;
 class UParticleSystemComponent;
 class UProjectileMovementComponent;
+class AWeapon_GrenadeProjectile;
 /**
  * 
  */
@@ -21,16 +22,15 @@ public:
 
 	AWeapon_Grenade();
 
-	UPROPERTY(EditAnywhere, Category = "Proejctile")
-	USphereComponent* DamageSphere;
-
-	UPROPERTY(EditAnywhere, Category = "Projectile")
-	UParticleSystemComponent* GrenadeFX;
-
-	UPROPERTY(EditAnywhere, Category = "Projectile")
-	UProjectileMovementComponent* GrenadeMovementComponent;
-
+	// Called when player click primary fire button
 	virtual void WeaponPrimaryFire() override;
 
+	// Called when player click secondary fire button
+	virtual void WeaponSecondaryFire() override;
+
+	// Called when player release fire button
 	virtual void WeaponStopFire() override;
+
+	UPROPERTY(EditAnywhere, Category = "Projectile")
+	TSubclassOf<AWeapon_GrenadeProjectile> ProjectileClass;
 };

@@ -101,7 +101,7 @@ void AWeapon_Base::WeaponPrimaryFire()
 }
 
 // Called when weapon secondry fire
-void AWeapon_Base::WeaponSecondryFire()
+void AWeapon_Base::WeaponSecondaryFire()
 {
 	if (WeaponConfig.WeaponName == TEXT("glock18") || WeaponConfig.WeaponName == TEXT("famas"))
 	{
