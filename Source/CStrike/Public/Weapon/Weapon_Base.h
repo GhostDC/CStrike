@@ -192,6 +192,9 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "Action")
 	void WeaponTracePerShot();
 
+	// Get player aim transform
+	FTransform GetAimTransform();
+
 	// Check weapon can fire or not before weapon fire
 	bool CanFire();
 

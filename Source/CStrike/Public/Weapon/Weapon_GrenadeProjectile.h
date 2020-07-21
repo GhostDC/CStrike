@@ -40,4 +40,7 @@ public:
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 
+	UFUNCTION()
+	void Explode(const FHitResult& OutHit);
+
 };

@@ -2,6 +2,7 @@
 
 
 #include "Weapon/Weapon_GrenadeProjectile.h"
+#include "DrawDebugHelpers.h"
 #include "Components/SphereComponent.h"
 #include "Components/StaticMeshComponent.h"
 #include "Particles/ParticleSystemComponent.h"
@@ -26,6 +27,7 @@ AWeapon_GrenadeProjectile::AWeapon_GrenadeProjectile()
 	GrenadeProjectile->InitialSpeed = 3000.0f;
 	GrenadeProjectile->MaxSpeed = 3000.0f;
 	GrenadeProjectile->bRotationFollowsVelocity = true;
+	GrenadeProjectile->OnProjectileStop.AddDynamic(this, &AWeapon_GrenadeProjectile::Explode);
 }
 
 // Called when the game starts or when spawned
@@ -42,3 +44,28 @@ void AWeapon_GrenadeProjectile::Tick(float DeltaTime)
 
 }
 
+void AWeapon_GrenadeProjectile::Explode(const FHitResult& OutHit)
+{
+	UE_LOG(LogTemp, Warning, TEXT("Explode"));
+	TArray<FHitResult> OutHits;
+
+	FVector ActorLocation = GetActorLocation();
+	FVector Start = ActorLocation;
+	FVector End = ActorLocation;
+
+	FCollisionShape ExplodeRange = FCollisionShape::MakeSphere(500.0f);
+	DrawDebugSphere(GetWorld(), ActorLocation, ExplodeRange.GetSphereRadius(), 50, FColor::Red, true);
+
+	bool isHit = GetWorld()->SweepMultiByChannel(OutHits, Start, End, FQuat::Identity, ECC_WorldStatic, ExplodeRange);
+	if (isHit)
+	{
+		for (auto& Hit : OutHits)
+		{
+			UStaticMeshComponent* ImpluseActor = Cast<UStaticMeshComponent>(Hit.GetActor()->GetRootComponent());
+			if (ImpluseActor)
+			{
+				ImpluseActor->AddRadialImpulse(GetActorLocation(), 500.f, 2000.f, ERadialImpulseFalloff::RIF_Constant, true);
+			}
+		}
+	}
+}

@@ -28,4 +28,7 @@ void AWeapon_Grenade::WeaponSecondaryFire()
 void AWeapon_Grenade::WeaponStopFire()
 {
 	UE_LOG(LogTemp, Warning, TEXT("Thrown Grenade"));
+	FVector SpawnLoc = GetAimTransform().GetLocation() + WeaponOwner->GetActorForwardVector() * 100.0f;
+	FRotator SpawnRot = GetAimTransform().Rotator();
+	GetWorld()->SpawnActor<AWeapon_GrenadeProjectile>(ProjectileClass, SpawnLoc, SpawnRot);
 }

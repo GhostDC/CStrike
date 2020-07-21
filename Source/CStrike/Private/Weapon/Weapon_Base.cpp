@@ -272,6 +272,20 @@ void AWeapon_Base::WeaponTracePerShot()
 	DrawDebugLine(GetWorld(), TraceStart, TraceEnd, FColor::Orange, true, 2.0f);
 }
 
+// Get player 
+FTransform AWeapon_Base::GetAimTransform()
+{
+	FVector CamLoc;
+	FRotator CamRot;
+	FTransform CamTrans;
+	if (WeaponOwner)
+	{
+		WeaponOwner->GetActorEyesViewPoint(CamLoc, CamRot);
+		CamTrans = FTransform(CamRot, CamLoc);
+	}
+	return CamTrans;
+}
+
 // Check weapon can fire or not before weapon fire
 bool AWeapon_Base::CanFire()
 {
