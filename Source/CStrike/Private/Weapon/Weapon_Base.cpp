@@ -159,8 +159,11 @@ void AWeapon_Base::WeaponReload()
 		{
 			ReserveAmmo -= (WeaponConfig.PrimaryClipSize - PrimaryAmmo);
 			PrimaryAmmo = WeaponConfig.PrimaryClipSize;
-			WeaponMesh1P->PlayAnimation(ReloadAnimation[0], false);
-			WeaponOwner->Mesh1P->PlayAnimation(ReloadAnimation[1], false);
+			if (ReloadAnimation.Num() > 0)
+			{
+				WeaponMesh1P->PlayAnimation(ReloadAnimation[0], false);
+				WeaponOwner->Mesh1P->PlayAnimation(ReloadAnimation[1], false);
+			}
 			UE_LOG(LogTemp, Warning, TEXT("PrimaryAmmo:%d ReserveAmmo:%d"), PrimaryAmmo, ReserveAmmo);
 		}
 		else if (ReserveAmmo < WeaponConfig.PrimaryClipSize && ReserveAmmo > 0)
@@ -169,16 +172,22 @@ void AWeapon_Base::WeaponReload()
 			{
 				ReserveAmmo -= (WeaponConfig.PrimaryClipSize - PrimaryAmmo);
 				PrimaryAmmo = WeaponConfig.PrimaryClipSize;
-				WeaponMesh1P->PlayAnimation(ReloadAnimation[0], false);
-				WeaponOwner->Mesh1P->PlayAnimation(ReloadAnimation[1], false);
+				if (ReloadAnimation.Num() > 0)
+				{
+					WeaponMesh1P->PlayAnimation(ReloadAnimation[0], false);
+					WeaponOwner->Mesh1P->PlayAnimation(ReloadAnimation[1], false);
+				}
 				UE_LOG(LogTemp, Warning, TEXT("PrimaryAmmo:%d ReserveAmmo:%d"), PrimaryAmmo, ReserveAmmo);
 			}
 			else
 			{
 				PrimaryAmmo = ReserveAmmo;
 				ReserveAmmo = 0;
-				WeaponMesh1P->PlayAnimation(ReloadAnimation[0], false);
-				WeaponOwner->Mesh1P->PlayAnimation(ReloadAnimation[1], false);
+				if (ReloadAnimation.Num() > 0)
+				{
+					WeaponMesh1P->PlayAnimation(ReloadAnimation[0], false);
+					WeaponOwner->Mesh1P->PlayAnimation(ReloadAnimation[1], false);
+				}
 				UE_LOG(LogTemp, Warning, TEXT("PrimaryAmmo:%d ReserveAmmo:%d"), PrimaryAmmo, ReserveAmmo);
 			}
 		}
@@ -257,8 +266,11 @@ void AWeapon_Base::DetachWeaponFromPlayer()
 // Called player want to inspect weapon
 void AWeapon_Base::WeaponInspect()
 {
-	WeaponMesh1P->PlayAnimation(InspectAnimation[0], false);
-	WeaponOwner->Mesh1P->PlayAnimation(InspectAnimation[1], false);
+	if (InspectAnimation.Num() > 0)
+	{
+		WeaponMesh1P->PlayAnimation(InspectAnimation[0], false);
+		WeaponOwner->Mesh1P->PlayAnimation(InspectAnimation[1], false);
+	}
 }
 
 // Called when weapon per shot
