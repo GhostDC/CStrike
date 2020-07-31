@@ -3,7 +3,8 @@
 
 #include "Weapon/Weapon_C4.h"
 #include "Player/CSPlayer.h"
-#include "Weapon/Weapon_C4_Actived.h"
+#include "Weapon/Weapon_C4_Planted.h"
+#include "Components/CapsuleComponent.h"
 
 // Called every frame
 void AWeapon_C4::Tick(float DeltaTime)
@@ -49,11 +50,12 @@ void AWeapon_C4::Planted()
 	if (IsPlanting)
 	{
 		UE_LOG(LogTemp, Warning, TEXT("C4 planted"));
-		FVector SpawnLoc = WeaponOwner->GetActorLocation();
+		FVector PlayerLoc = WeaponOwner->GetActorLocation();
+		FVector SpawnLoc = FVector(PlayerLoc.X,PlayerLoc.Y,PlayerLoc.Z-WeaponOwner->GetCapsuleComponent()->GetScaledCapsuleHalfHeight());
 		FRotator SpawnRot = GetAimTransform().Rotator();
 		WeaponMesh1P->PlayAnimation(nullptr, false);
 		WeaponOwner->Mesh1P->PlayAnimation(nullptr, false);
-		GetWorld()->SpawnActor<AWeapon_C4_Actived>(PlantedC4, SpawnLoc, SpawnRot);
+		GetWorld()->SpawnActor<AWeapon_C4_Planted>(PlantedC4, SpawnLoc, WeaponOwner->GetActorRotation());
 		WeaponOwner = nullptr;
 		DetachFromActor(FDetachmentTransformRules::KeepRelativeTransform);
 		DetachWeaponFromPlayer();

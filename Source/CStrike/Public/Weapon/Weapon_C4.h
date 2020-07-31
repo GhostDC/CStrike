@@ -10,7 +10,7 @@
  * 
  */
 
-class AWeapon_C4_Actived;
+class AWeapon_C4_Planted;
 
 USTRUCT()
 struct FC4Data
@@ -40,7 +40,7 @@ protected:
 	FTimerHandle ExplodeTimer;
 
 	UPROPERTY(EditAnywhere, Category = "Spawn")
-	TSubclassOf<AWeapon_C4_Actived> PlantedC4;
+	TSubclassOf<AWeapon_C4_Planted> PlantedC4;
 
 public:
 
