@@ -207,22 +207,55 @@ void AWeapon_Base::WeaponDraw(ACSPlayer* DrawPlayer)
 {
 	if (DrawPlayer)
 	{
-		if (WeaponType == EWeaponType::Pistol && !DrawPlayer->WeaponSlot[1])
+		switch (WeaponType)
 		{
-			SetOwner(DrawPlayer);
-			WeaponOwner = DrawPlayer;
-			WeaponDropMesh->SetVisibility(false);
-			WeaponDropMesh->SetSimulatePhysics(false);
-			WeaponDropMesh->SetGenerateOverlapEvents(false);
-			AttachToActor(WeaponOwner, FAttachmentTransformRules::SnapToTargetIncludingScale);
-			AttachWeaponToPlayer();
-			WeaponOwner->CurrentWeapon = this;
-			WeaponOwner->WeaponSlot[1] = this;
-			WeaponMesh1P->PlayAnimation(DrawAnimation[0], false);
-			WeaponOwner->Mesh1P->PlayAnimation(DrawAnimation[1], false);
+		case Pistol:
+		{
+			if (!DrawPlayer->WeaponSlot[1])
+			{
+				WeaponAddToPlayer(DrawPlayer);
+				WeaponOwner->WeaponSlot[1] = this;
+			}
+		}break;
+		case Knife:
+		{
+			if (!DrawPlayer->WeaponSlot[2])
+			{
+				WeaponAddToPlayer(DrawPlayer);
+				WeaponOwner->WeaponSlot[2] = this;
+			}
+		}break;
+		case Rifle:
+		case SniperRifle:
+		case ShotGun:
+		case MachineGun:
+		case SubMachineGun:
+		{
+			if (!DrawPlayer->WeaponSlot[0])
+			{
+				WeaponAddToPlayer(DrawPlayer);
+				WeaponOwner->WeaponSlot[0] = this;
+			}
+		}break;
+		default:
+			break;
 		}
+		WeaponPlayAnimation(DrawAnimation, 0, 1);
 	}
 }
+
+void AWeapon_Base::WeaponAddToPlayer(ACSPlayer* DrawPlayer)
+{
+	SetOwner(DrawPlayer);
+	WeaponOwner = DrawPlayer;
+	WeaponDropMesh->SetVisibility(false);
+	WeaponDropMesh->SetSimulatePhysics(false);
+	WeaponDropMesh->SetGenerateOverlapEvents(false);
+	AttachToActor(WeaponOwner, FAttachmentTransformRules::SnapToTargetIncludingScale);
+	AttachWeaponToPlayer();
+	WeaponOwner->CurrentWeapon = this;
+}
+
 
 // Called player drop weapon and spawn a pick up blueprint for weapon
 void AWeapon_Base::WeaponDrop()
@@ -243,6 +276,12 @@ void AWeapon_Base::WeaponDrop()
 		WeaponOwner = nullptr;
 		this->SetOwner(nullptr);
 	}
+}
+
+void AWeapon_Base::WeaponPlayAnimation(TArray<UAnimationAsset*> AnimationArray,int32 WeaponAnimIndex,int32 PlayerAnimIndex)
+{
+	WeaponMesh1P->PlayAnimation(AnimationArray[WeaponAnimIndex], false);
+	WeaponOwner->Mesh1P->PlayAnimation(AnimationArray[PlayerAnimIndex], false);
 }
 
 // Called when need to attach weapon to player

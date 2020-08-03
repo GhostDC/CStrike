@@ -41,20 +41,25 @@ void AWeapon_C4::WeaponStopFire()
 	{
 		UE_LOG(LogTemp, Warning, TEXT("Stop plant C4"));
 		IsPlanting = false;
+		WeaponMesh1P->Stop();
+		WeaponOwner->Mesh1P->Stop();
 	}
 }
 
 // Called C4 plant finished
 void AWeapon_C4::Planted()
 {
-	if (IsPlanting)
+	int32 WeaponIndex;
+	if (IsPlanting && WeaponOwner->WeaponSlot.Find(this,WeaponIndex))
 	{
 		UE_LOG(LogTemp, Warning, TEXT("C4 planted"));
 		FVector PlayerLoc = WeaponOwner->GetActorLocation();
-		FVector SpawnLoc = FVector(PlayerLoc.X,PlayerLoc.Y,PlayerLoc.Z-WeaponOwner->GetCapsuleComponent()->GetScaledCapsuleHalfHeight());
+		FVector SpawnLoc = FVector(PlayerLoc.X, PlayerLoc.Y, PlayerLoc.Z - WeaponOwner->GetCapsuleComponent()->GetScaledCapsuleHalfHeight());
 		FRotator SpawnRot = GetAimTransform().Rotator();
 		WeaponMesh1P->PlayAnimation(nullptr, false);
 		WeaponOwner->Mesh1P->PlayAnimation(nullptr, false);
+		WeaponOwner->CurrentWeapon = nullptr;
+		WeaponOwner->WeaponSlot[WeaponIndex] = nullptr;
 		GetWorld()->SpawnActor<AWeapon_C4_Planted>(PlantedC4, SpawnLoc, WeaponOwner->GetActorRotation());
 		WeaponOwner = nullptr;
 		DetachFromActor(FDetachmentTransformRules::KeepRelativeTransform);

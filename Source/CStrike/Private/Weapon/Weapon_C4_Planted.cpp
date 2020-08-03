@@ -2,6 +2,7 @@
 
 
 #include "Weapon/Weapon_C4_Planted.h"
+#include "Player/CSPlayer.h"
 #include "DrawDebugHelpers.h"
 #include "Kismet/GameplayStatics.h"
 //#include "Components/StaticMeshComponent.h"
@@ -49,7 +50,6 @@ void AWeapon_C4_Planted::Explode()
 	FCollisionShape ExplodeRange = FCollisionShape::MakeSphere(1200.0f);
 	DrawDebugSphere(GetWorld(), GetActorLocation(), ExplodeRange.GetSphereRadius(), 50, FColor::Orange, true);
 	bool isHit = GetWorld()->SweepMultiByChannel(OutHits, ActorLocation, ActorLocation, FQuat::Identity, ECC_WorldStatic, ExplodeRange);
-
 	if (isHit)
 	{
 		for (auto& Hit : OutHits)
@@ -58,6 +58,23 @@ void AWeapon_C4_Planted::Explode()
 			if (ImpulseActor)
 			{
 				ImpulseActor->AddRadialImpulse(ActorLocation, 900.0f, 2000.0f, ERadialImpulseFalloff::RIF_Constant, true);
+			}
+		}
+	}
+	bool IsHitPlayer = GetWorld()->SweepMultiByChannel(OutHits, ActorLocation, ActorLocation, FQuat::Identity, ECC_Pawn, ExplodeRange);
+	if (IsHitPlayer)
+	{
+		for (auto& Hit : OutHits)
+		{
+			ACSPlayer* DamagePlayer = Cast<ACSPlayer>(Hit.GetActor());
+			if (DamagePlayer)
+			{
+				float Distance = FVector::Distance(GetActorLocation(), DamagePlayer->GetActorLocation());
+				UE_LOG(LogTemp, Warning, TEXT("Distance: %f"), Distance);
+				float Damage = 300.0f / Distance * 100.0f;
+				TSubclassOf<UDamageType> DamageType;
+				TArray<AActor*> IgnoreActor;
+				UGameplayStatics::ApplyRadialDamage(this, 300.0f, ActorLocation, 900.0f, DamageType, IgnoreActor, this, nullptr, false, ECC_Pawn);
 			}
 		}
 	}

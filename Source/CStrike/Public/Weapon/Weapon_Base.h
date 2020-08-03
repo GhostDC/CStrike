@@ -172,9 +172,17 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "Action")
 	void WeaponDraw(ACSPlayer *DrawPlayer);
 
+	// Called when player get weapon
+	UFUNCTION()
+	void WeaponAddToPlayer(ACSPlayer* DrawPlayer);
+
 	// Called when weapon drop
 	UFUNCTION(BlueprintCallable, Category = "Action")
 	void WeaponDrop();
+
+	// Called when weapon need to play animation
+	UFUNCTION()
+	void WeaponPlayAnimation(TArray<UAnimationAsset*> AnimationArray,int32 WeaponAnimIndex, int32 PlayerAnimIndex);
 
 	// Called when need to attach weapon to player
 	UFUNCTION()

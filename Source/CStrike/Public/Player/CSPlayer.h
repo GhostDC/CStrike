@@ -31,6 +31,10 @@ public:
 	UPROPERTY(VisibleAnywhere, Category = "Weapon")
 	AWeapon_Base* CurrentWeapon;
 
+	// Set player last weapon
+	UPROPERTY(VisibleAnywhere, Category = "Weapon")
+	AWeapon_Base* LastWeapon;
+
 	// Set ray trace range
 	UPROPERTY(EditAnywhere, Category = "Config")
 	float TraceRange = 3000.0f;

@@ -144,6 +144,7 @@ void ACSPlayer::PlayerPickup()
 float ACSPlayer::TakeDamage(float DamageAmount, struct FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser)
 {
 	Super::TakeDamage(DamageAmount, DamageEvent, EventInstigator, DamageCauser);
+	UE_LOG(LogTemp, Warning, TEXT("TakeDamage : %d"), DamageAmount);
 	if (Ammor == 0)
 	{
 		Health -= DamageAmount;

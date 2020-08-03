@@ -2,7 +2,9 @@
 
 
 #include "Weapon/Weapon_GrenadeProjectile.h"
+#include "Player/CSPlayer.h"
 #include "DrawDebugHelpers.h"
+#include "Kismet/GameplayStatics.h"
 #include "Components/SphereComponent.h"
 #include "Components/StaticMeshComponent.h"
 #include "Particles/ParticleSystemComponent.h"
@@ -56,8 +58,8 @@ void AWeapon_GrenadeProjectile::Explode(const FHitResult& OutHit)
 	FCollisionShape ExplodeRange = FCollisionShape::MakeSphere(500.0f);
 	DrawDebugSphere(GetWorld(), ActorLocation, ExplodeRange.GetSphereRadius(), 50, FColor::Red, true);
 
-	bool isHit = GetWorld()->SweepMultiByChannel(OutHits, Start, End, FQuat::Identity, ECC_WorldStatic, ExplodeRange);
-	if (isHit)
+	bool IsHitPhy = GetWorld()->SweepMultiByChannel(OutHits, Start, End, FQuat::Identity, ECC_WorldStatic, ExplodeRange);
+	if (IsHitPhy)
 	{
 		for (auto& Hit : OutHits)
 		{
@@ -65,6 +67,21 @@ void AWeapon_GrenadeProjectile::Explode(const FHitResult& OutHit)
 			if (ImpluseActor)
 			{
 				ImpluseActor->AddRadialImpulse(GetActorLocation(), 500.f, 2000.f, ERadialImpulseFalloff::RIF_Constant, true);
+			}
+		}
+	}
+	bool IsHitPlayer = GetWorld()->SweepMultiByChannel(OutHits, Start, End, FQuat::Identity, ECC_Pawn, ExplodeRange);
+	if (IsHitPlayer)
+	{
+		for(auto& Hit:OutHits)
+		{
+			ACSPlayer* DamagePlayer = Cast<ACSPlayer>(Hit.GetActor());
+			if (DamagePlayer)
+			{
+				float Distance = FVector::Distance(GetActorLocation(),DamagePlayer->GetActorLocation());
+				float Damage = 100.0f / Distance * 100.0f;
+				TSubclassOf<UDamageType> DamageType;
+				UGameplayStatics::ApplyPointDamage(this, Damage, GetActorLocation(), Hit, nullptr, this, DamageType);
 			}
 		}
 	}
