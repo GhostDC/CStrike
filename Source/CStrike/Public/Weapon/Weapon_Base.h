@@ -120,6 +120,8 @@ public:
 	UPROPERTY(EditAnywhere, Category = "Animation")
 	TArray<UAnimationAsset *> InspectAnimation;
 
+	TArray<AActor*> OverlappingActor;
+
 	TArray<FHitResult> HitResults;
 
 	// WeaponAmmo

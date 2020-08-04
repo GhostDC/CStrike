@@ -50,8 +50,18 @@ void AWeapon_Base::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 	if (FPlatformTime::Seconds() - SpawnTime >= 1.0f)
-	{
 		WeaponDropMesh->SetGenerateOverlapEvents(true);
+	WeaponMesh1P->GetOverlappingActors(OverlappingActor);
+	if (OverlappingActor.Num() > 0)
+	{
+		for (auto &OverlapActor : OverlappingActor)
+		{
+			ACSPlayer* OverlapPlayer = Cast<ACSPlayer>(OverlapActor);
+			if (OverlapPlayer)
+			{
+				WeaponDraw(OverlapPlayer);
+			}
+		}
 	}
 }
 
@@ -61,9 +71,7 @@ void AWeapon_Base::WeaponOverlapHandler(UPrimitiveComponent* OverlappedComponent
 	{
 		ACSPlayer* OverlapActor = Cast<ACSPlayer>(OtherActor);
 		if (OverlapActor)
-		{
 			WeaponDraw(OverlapActor);
-		}
 	}
 }
 
@@ -75,24 +83,20 @@ void AWeapon_Base::WeaponPrimaryFire()
 		UE_LOG(LogTemp, Log, TEXT("Weapon primary fire"));
 		if (WeaponType == EWeaponType::Knife)
 		{
-			WeaponMesh1P->PlayAnimation(FireAnimation[0], false);
-			WeaponOwner->Mesh1P->PlayAnimation(FireAnimation[1], false);
+			if (FireAnimation.Num() >= 2)
+				WeaponPlayAnimation(FireAnimation, 0, 1);
 			UE_LOG(LogTemp, Warning, TEXT("PrimaryAmmo:%d ReserveAmmo:%d"), PrimaryAmmo, ReserveAmmo);
 		}
 		else if (PrimaryAmmo > 0)
 		{
 			if (WeaponConfig.isFullAuto)
-			{
 				GetWorldTimerManager().SetTimer(FireTimer, this, &AWeapon_Base::WeaponInstantFire, WeaponConfig.CycleTime, true, 0.0f);
-			}
 			else
 			{
 				if (WeaponConfig.isBrustFire)
 				{
 					for (int32 i = 0; i < WeaponConfig.BrustShotCost; i++)
-					{
 						GetWorldTimerManager().SetTimer(FireTimer, this, &AWeapon_Base::WeaponInstantFire, WeaponConfig.CycleTime, false, 0.0f);
-					}
 				}
 				else WeaponInstantFire();
 			}
@@ -104,29 +108,23 @@ void AWeapon_Base::WeaponPrimaryFire()
 void AWeapon_Base::WeaponSecondaryFire()
 {
 	if (WeaponConfig.WeaponName == TEXT("glock18") || WeaponConfig.WeaponName == TEXT("famas"))
-	{
 		WeaponConfig.isBrustFire = true;
-	}
 	else if (WeaponType == EWeaponType::SniperRifle)
-	{
 		UE_LOG(LogTemp, Warning, TEXT("Your sniper rifle is scoped"));
-	}
 }
 
 // Called when player release fire
 void AWeapon_Base::WeaponStopFire()
 {
 	if (GetWorldTimerManager().IsTimerActive(FireTimer))
-	{
 		GetWorldTimerManager().ClearTimer(FireTimer);
-	}
 }
 
 // Called when player want to fire weapon multiple times
 void AWeapon_Base::WeaponInstantFire()
 {
-	WeaponMesh1P->PlayAnimation(FireAnimation[0], false);
-	WeaponOwner->Mesh1P->PlayAnimation(FireAnimation[1], false);
+	if (FireAnimation.Num() >= 2)
+		WeaponPlayAnimation(FireAnimation, 0, 1);
 	if (PrimaryAmmo > 0)
 	{
 		PrimaryAmmo--;
@@ -159,11 +157,8 @@ void AWeapon_Base::WeaponReload()
 		{
 			ReserveAmmo -= (WeaponConfig.PrimaryClipSize - PrimaryAmmo);
 			PrimaryAmmo = WeaponConfig.PrimaryClipSize;
-			if (ReloadAnimation.Num() > 0)
-			{
-				WeaponMesh1P->PlayAnimation(ReloadAnimation[0], false);
-				WeaponOwner->Mesh1P->PlayAnimation(ReloadAnimation[1], false);
-			}
+			if (ReloadAnimation.Num() >= 2)
+				WeaponPlayAnimation(ReloadAnimation, 0, 1);
 			UE_LOG(LogTemp, Warning, TEXT("PrimaryAmmo:%d ReserveAmmo:%d"), PrimaryAmmo, ReserveAmmo);
 		}
 		else if (ReserveAmmo < WeaponConfig.PrimaryClipSize && ReserveAmmo > 0)
@@ -172,22 +167,16 @@ void AWeapon_Base::WeaponReload()
 			{
 				ReserveAmmo -= (WeaponConfig.PrimaryClipSize - PrimaryAmmo);
 				PrimaryAmmo = WeaponConfig.PrimaryClipSize;
-				if (ReloadAnimation.Num() > 0)
-				{
-					WeaponMesh1P->PlayAnimation(ReloadAnimation[0], false);
-					WeaponOwner->Mesh1P->PlayAnimation(ReloadAnimation[1], false);
-				}
+				if (ReloadAnimation.Num() >= 2)
+					WeaponPlayAnimation(ReloadAnimation, 0, 1);
 				UE_LOG(LogTemp, Warning, TEXT("PrimaryAmmo:%d ReserveAmmo:%d"), PrimaryAmmo, ReserveAmmo);
 			}
 			else
 			{
 				PrimaryAmmo = ReserveAmmo;
 				ReserveAmmo = 0;
-				if (ReloadAnimation.Num() > 0)
-				{
-					WeaponMesh1P->PlayAnimation(ReloadAnimation[0], false);
-					WeaponOwner->Mesh1P->PlayAnimation(ReloadAnimation[1], false);
-				}
+				if (ReloadAnimation.Num() >= 2)
+					WeaponPlayAnimation(ReloadAnimation, 0, 1);
 				UE_LOG(LogTemp, Warning, TEXT("PrimaryAmmo:%d ReserveAmmo:%d"), PrimaryAmmo, ReserveAmmo);
 			}
 		}
@@ -305,7 +294,7 @@ void AWeapon_Base::DetachWeaponFromPlayer()
 // Called player want to inspect weapon
 void AWeapon_Base::WeaponInspect()
 {
-	if (InspectAnimation.Num() > 0)
+	if (InspectAnimation.Num() >= 2)
 	{
 		WeaponMesh1P->PlayAnimation(InspectAnimation[0], false);
 		WeaponOwner->Mesh1P->PlayAnimation(InspectAnimation[1], false);
