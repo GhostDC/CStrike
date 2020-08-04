@@ -1,5 +1,7 @@
-##CounterStrike:GlobalOffensive Unreal Engine 4 Remake
+##CounterStrike:GlobalOffensive in Unreal Engine 4
+
 This project is just personal proejct
+
 just want CSGO prot to Source 2 as soon as possible
 - ToDo:
   - Player
