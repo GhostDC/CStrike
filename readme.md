@@ -1,0 +1,60 @@
+##CounterStrike:GlobalOffensive Unreal Engine 4 Remake
+This project is just personal proejct
+just want CSGO prot to Source 2 as soon as possible
+- ToDo:
+  - Player
+    - [x] Movement
+    - [x] Fire
+    - [x] Reload
+    - [x] Plant C4
+    - [ ] Crouch
+    - [ ] Jump
+    - [ ] Use
+    - [ ] Defaulse
+  - Weapon (Weapon Base Done)
+    - Pistol
+        - [ ] Glock-18
+        - [ ] USP-S
+        - [ ] P2000
+        - [ ] Dual Berettas
+        - [ ] P250
+        - [ ] TEC-9
+        - [ ] FN57
+        - [ ] Desert Eagle
+        - [ ] Revolver
+    - Heavy Machine Gun
+        - [ ] Nova
+        - [ ] XM1014
+        - [ ] Sawed-Off
+        - [ ] MAG-7
+        - [ ] M249
+        - [ ] Negev
+    - Sub Machine Gun
+        - [ ] MAC-10
+        - [ ] MP9
+        - [ ] MP7
+        - [ ] MP5-SD
+        - [ ] UMP-45
+        - [ ] P90
+        - [ ] PP-Bizon
+    - Rifle
+        - [ ] Galil AR
+        - [ ] FAMAS
+        - [ ] AK47
+        - [ ] M4A4
+        - [ ] M4A1-S
+        - [ ] SSG 08
+        - [ ] SG 553
+        - [ ] AUG
+        - [ ] AWP
+        - [ ] G3SG1
+        - [ ] SCAR-20
+    - Equipment
+        - [ ] Zeus x27
+  - Grenade (Grenade Base Done)
+    - [ ] FragGrenade
+    - [ ] SmokeGrenade
+    - [ ] FlashGrenade
+    - [ ] DecoyGreande
+    - [ ] Molotov
+    - [ ] Incgrenade
