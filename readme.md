@@ -1,6 +1,6 @@
 ##CounterStrike:GlobalOffensive in Unreal Engine 4
 
-This project is just personal proejct
+This project is just personal project
 
 just want CSGO prot to Source 2 as soon as possible
 - ToDo:
@@ -15,7 +15,7 @@ just want CSGO prot to Source 2 as soon as possible
     - [ ] Defuse
   - Weapon (Weapon Base Done)
     - Pistol
-        - [ ] Glock-18
+        - [x] Glock-18
         - [ ] USP-S
         - [ ] P2000
         - [ ] Dual Berettas
@@ -59,4 +59,4 @@ just want CSGO prot to Source 2 as soon as possible
     - [ ] FlashGrenade
     - [ ] DecoyGreande
     - [ ] Molotov
-    - [ ] Incgrenade
+    - [ ] IncendiaryGrenade
