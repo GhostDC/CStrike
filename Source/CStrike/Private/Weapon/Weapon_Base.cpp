@@ -55,7 +55,7 @@ void AWeapon_Base::Tick(float DeltaTime)
 
 void AWeapon_Base::WeaponOverlapHandler(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
-	if (OtherActor->IsA<ACSPlayer>()||OtherComp)
+	if (OtherActor->IsA<ACSPlayer>() || OtherComp)
 	{
 		ACSPlayer* OverlapActor = Cast<ACSPlayer>(OtherActor);
 		ACSPlayer* OverlapCompOwner = Cast<ACSPlayer>(OtherComp->GetOwner());
@@ -86,8 +86,8 @@ void AWeapon_Base::WeaponPrimaryFire()
 			{
 				if (WeaponConfig.isBurstFire)
 				{
-						GetWorldTimerManager().SetTimer(BurstTimer, this, &AWeapon_Base::WeaponInstantFire, WeaponConfig.CycleTime, true, 0.0f);
-						//WeaponInstantFire();
+					GetWorldTimerManager().SetTimer(BurstTimer, this, &AWeapon_Base::WeaponInstantFire, WeaponConfig.CycleTime, true, 0.0f);
+					//WeaponInstantFire();
 				}
 				else WeaponInstantFire();
 			}
@@ -114,7 +114,27 @@ void AWeapon_Base::WeaponSecondaryFire()
 		}
 	}
 	else if (WeaponType == EWeaponType::SniperRifle)
+	{
 		UE_LOG(LogTemp, Warning, TEXT("Your sniper rifle is scoped"));
+		switch (ZoomTime)
+		{
+		case 0:
+			WeaponOwner->FPSCamera->SetFieldOfView(50);
+			ZoomTime++;
+			break;
+		case 1:
+			WeaponOwner->FPSCamera->SetFieldOfView(30);
+			ZoomTime++;
+			break;
+		case 2:
+			ZoomTime = 0;
+			WeaponOwner->FPSCamera->SetFieldOfView(90);
+			break;
+		default:
+			break;
+		}
+	}
+
 }
 
 // Called when player release fire
@@ -148,7 +168,7 @@ void AWeapon_Base::WeaponInstantFire()
 		}
 		UE_LOG(LogTemp, Warning, TEXT("PrimaryAmmo:%d ReserveAmmo:%d"), PrimaryAmmo, ReserveAmmo);
 		BurstTime++;
-		if (WeaponConfig.isBurstFire && BurstTime>=WeaponConfig.BurstShotCost)
+		if (WeaponConfig.isBurstFire && BurstTime >= WeaponConfig.BurstShotCost)
 		{
 			GetWorldTimerManager().ClearTimer(BurstTimer);
 			BurstTime = 0;
@@ -281,7 +301,7 @@ void AWeapon_Base::WeaponDrop()
 	}
 }
 
-void AWeapon_Base::WeaponPlayAnimation(TArray<UAnimationAsset*> AnimationArray,int32 WeaponAnimIndex,int32 PlayerAnimIndex)
+void AWeapon_Base::WeaponPlayAnimation(TArray<UAnimationAsset*> AnimationArray, int32 WeaponAnimIndex, int32 PlayerAnimIndex)
 {
 	WeaponMesh1P->PlayAnimation(AnimationArray[WeaponAnimIndex], false);
 	WeaponOwner->Mesh1P->PlayAnimation(AnimationArray[PlayerAnimIndex], false);

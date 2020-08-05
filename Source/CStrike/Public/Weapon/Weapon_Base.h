@@ -29,6 +29,9 @@ public:
 	int32 BurstShotCost;
 
 	UPROPERTY(EditAnywhere, Category = "Config")
+	int32 ZoomLevel;
+
+	UPROPERTY(EditAnywhere, Category = "Config")
 	float BaseDamage;
 
 	UPROPERTY(EditAnywhere, Category = "Config")
@@ -126,6 +129,9 @@ public:
 	int32 PrimaryAmmo = -1;
 
 	int32 ReserveAmmo = -1;
+
+	// ZoomTime
+	int32 ZoomTime;
 
 	// BurstTime
 	int32 BurstTime;
