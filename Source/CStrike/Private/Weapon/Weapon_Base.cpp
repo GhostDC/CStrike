@@ -51,27 +51,18 @@ void AWeapon_Base::Tick(float DeltaTime)
 	Super::Tick(DeltaTime);
 	if (FPlatformTime::Seconds() - SpawnTime >= 1.0f)
 		WeaponDropMesh->SetGenerateOverlapEvents(true);
-	WeaponMesh1P->GetOverlappingActors(OverlappingActor);
-	if (OverlappingActor.Num() > 0)
-	{
-		for (auto &OverlapActor : OverlappingActor)
-		{
-			ACSPlayer* OverlapPlayer = Cast<ACSPlayer>(OverlapActor);
-			if (OverlapPlayer)
-			{
-				WeaponDraw(OverlapPlayer);
-			}
-		}
-	}
 }
 
 void AWeapon_Base::WeaponOverlapHandler(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
-	if (OtherActor->IsA<ACSPlayer>())
+	if (OtherActor->IsA<ACSPlayer>()||OtherComp)
 	{
 		ACSPlayer* OverlapActor = Cast<ACSPlayer>(OtherActor);
+		ACSPlayer* OverlapCompOwner = Cast<ACSPlayer>(OtherComp->GetOwner());
 		if (OverlapActor)
 			WeaponDraw(OverlapActor);
+		else if (OverlapCompOwner)
+			WeaponDraw(OverlapCompOwner);
 	}
 }
 
@@ -93,10 +84,10 @@ void AWeapon_Base::WeaponPrimaryFire()
 				GetWorldTimerManager().SetTimer(FireTimer, this, &AWeapon_Base::WeaponInstantFire, WeaponConfig.CycleTime, true, 0.0f);
 			else
 			{
-				if (WeaponConfig.isBrustFire)
+				if (WeaponConfig.isBurstFire)
 				{
-					for (int32 i = 0; i < WeaponConfig.BrustShotCost; i++)
-						GetWorldTimerManager().SetTimer(FireTimer, this, &AWeapon_Base::WeaponInstantFire, WeaponConfig.CycleTime, false, 0.0f);
+						GetWorldTimerManager().SetTimer(BurstTimer, this, &AWeapon_Base::WeaponInstantFire, WeaponConfig.CycleTime, true, 0.0f);
+						//WeaponInstantFire();
 				}
 				else WeaponInstantFire();
 			}
@@ -108,7 +99,20 @@ void AWeapon_Base::WeaponPrimaryFire()
 void AWeapon_Base::WeaponSecondaryFire()
 {
 	if (WeaponConfig.WeaponName == TEXT("glock18") || WeaponConfig.WeaponName == TEXT("famas"))
-		WeaponConfig.isBrustFire = true;
+	{
+		if (WeaponConfig.isBurstFire)
+		{
+			BurstTime = 0;
+			WeaponConfig.isBurstFire = false;
+			UE_LOG(LogTemp, Warning, TEXT("Your %s now in single mode"), *WeaponConfig.WeaponName.ToString());
+		}
+		else
+		{
+			BurstTime = 0;
+			WeaponConfig.isBurstFire = true;
+			UE_LOG(LogTemp, Warning, TEXT("Your %s now in burst mode"), *WeaponConfig.WeaponName.ToString());
+		}
+	}
 	else if (WeaponType == EWeaponType::SniperRifle)
 		UE_LOG(LogTemp, Warning, TEXT("Your sniper rifle is scoped"));
 }
@@ -123,10 +127,9 @@ void AWeapon_Base::WeaponStopFire()
 // Called when player want to fire weapon multiple times
 void AWeapon_Base::WeaponInstantFire()
 {
-	if (FireAnimation.Num() >= 2)
-		WeaponPlayAnimation(FireAnimation, 0, 1);
-	if (PrimaryAmmo > 0)
+	if (PrimaryAmmo > 0 && FireAnimation.Num() >= 2)
 	{
+		WeaponPlayAnimation(FireAnimation, 0, 1);
 		PrimaryAmmo--;
 		WeaponTracePerShot();
 		if (HitResults.Num() > 0)
@@ -144,6 +147,12 @@ void AWeapon_Base::WeaponInstantFire()
 			}
 		}
 		UE_LOG(LogTemp, Warning, TEXT("PrimaryAmmo:%d ReserveAmmo:%d"), PrimaryAmmo, ReserveAmmo);
+		BurstTime++;
+		if (WeaponConfig.isBurstFire && BurstTime>=WeaponConfig.BurstShotCost)
+		{
+			GetWorldTimerManager().ClearTimer(BurstTimer);
+			BurstTime = 0;
+		}
 	}
 }
 
@@ -187,6 +196,11 @@ void AWeapon_Base::WeaponReload()
 		else
 		{
 			UE_LOG(LogTemp, Warning, TEXT("No ammo can be reload"));
+		}
+		BurstTime = 0;
+		if (GetWorldTimerManager().IsTimerActive(BurstTimer))
+		{
+			GetWorldTimerManager().ClearTimer(BurstTimer);
 		}
 	}
 }

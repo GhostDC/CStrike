@@ -12,7 +12,7 @@ just want CSGO prot to Source 2 as soon as possible
     - [ ] Crouch
     - [ ] Jump
     - [ ] Use
-    - [ ] Defaulse
+    - [ ] Defuse
   - Weapon (Weapon Base Done)
     - Pistol
         - [ ] Glock-18

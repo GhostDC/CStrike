@@ -23,10 +23,10 @@ public:
 	bool isFullAuto;
 
 	UPROPERTY(EditAnywhere, Category = "Config")
-	bool isBrustFire;
+	bool isBurstFire;
 
 	UPROPERTY(EditAnywhere, Category = "Config")
-	int32 BrustShotCost;
+	int32 BurstShotCost;
 
 	UPROPERTY(EditAnywhere, Category = "Config")
 	float BaseDamage;
@@ -120,14 +120,15 @@ public:
 	UPROPERTY(EditAnywhere, Category = "Animation")
 	TArray<UAnimationAsset *> InspectAnimation;
 
-	TArray<AActor*> OverlappingActor;
-
 	TArray<FHitResult> HitResults;
 
 	// WeaponAmmo
 	int32 PrimaryAmmo = -1;
 
 	int32 ReserveAmmo = -1;
+
+	// BurstTime
+	int32 BurstTime;
 
 	// Weapon spawn time
 	int32 SpawnTime;
@@ -137,6 +138,8 @@ public:
 	FTimerHandle ClipInTimer;
 
 	FTimerHandle FireTimer;
+
+	FTimerHandle BurstTimer;
 
 protected:
 	// Called when the game starts or when spawned
