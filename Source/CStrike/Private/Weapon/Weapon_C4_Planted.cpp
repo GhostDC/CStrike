@@ -5,6 +5,7 @@
 #include "Player/CSPlayer.h"
 #include "DrawDebugHelpers.h"
 #include "Kismet/GameplayStatics.h"
+#include "Particles/ParticleSystem.h"
 //#include "Components/StaticMeshComponent.h"
 
 // Sets default values
@@ -42,6 +43,7 @@ void AWeapon_C4_Planted::Planted()
 void AWeapon_C4_Planted::Explode()
 {
 	UE_LOG(LogTemp, Warning, TEXT("Terrorist win"));
+	UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), ExplodeFX, GetActorTransform());
 	UGameplayStatics::PlaySoundAtLocation(this, ExplodeSound, GetActorLocation());
 	TArray<FHitResult> OutHits;
 

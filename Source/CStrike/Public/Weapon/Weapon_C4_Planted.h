@@ -21,6 +21,9 @@ public:
 	UPROPERTY(EditAnywhere, Category = "Sound")
 	USoundBase* ExplodeSound;
 
+	UPROPERTY(EditAnywhere, Category = "Effect")
+	UParticleSystem* ExplodeFX;
+
 	FTimerHandle ExplodeTimer;
 protected:
 	// Called when the game starts or when spawned
