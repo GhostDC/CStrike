@@ -100,7 +100,7 @@ public:
 	ACSPlayer *WeaponOwner;
 
 	// Weapon type
-	UPROPERTY(EditAnywhere, Category = "Config")
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Config")
 	TEnumAsByte<EWeaponType> WeaponType;
 
 	// Weapon data
@@ -212,7 +212,12 @@ public:
 	void WeaponTracePerShot();
 
 	// Get player aim transform
+	UFUNCTION(BlueprintCallable, Category = "Action")
 	FTransform GetAimTransform();
+
+	// Get weapon type
+	UFUNCTION(BlueprintCallable, Category = "Action")
+	int32 GetWeaponType();
 
 	// Check weapon can fire or not before weapon fire
 	bool CanFire();

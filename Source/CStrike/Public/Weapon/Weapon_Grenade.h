@@ -13,6 +13,18 @@ class AWeapon_GrenadeProjectile;
 /**
  * 
  */
+
+UENUM()
+enum EGrenadeType
+{
+	FragGrenade,
+	FlashGrenade,
+	SmokeGrenade,
+	DecoyGrenade,
+	IncendiaryGrenade,
+	Molotov
+};
+
 UCLASS()
 class CSTRIKE_API AWeapon_Grenade : public AWeapon_Base
 {
@@ -31,6 +43,11 @@ public:
 	// Called when player release fire button
 	virtual void WeaponStopFire() override;
 
+	UPROPERTY(EditAnywhere, Category = "Config")
+	TEnumAsByte<EGrenadeType> GrenadeType;
+
 	UPROPERTY(EditAnywhere, Category = "Projectile")
 	TSubclassOf<AWeapon_GrenadeProjectile> ProjectileClass;
+
+	int32 GrenadeCount;
 };

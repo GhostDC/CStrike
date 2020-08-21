@@ -12,7 +12,7 @@
 
 AWeapon_Grenade::AWeapon_Grenade()
 {
-
+	GrenadeCount = 1;
 }
 
 void AWeapon_Grenade::WeaponPrimaryFire()
@@ -27,8 +27,17 @@ void AWeapon_Grenade::WeaponSecondaryFire()
 
 void AWeapon_Grenade::WeaponStopFire()
 {
-	UE_LOG(LogTemp, Warning, TEXT("Thrown Grenade"));
+	UE_LOG(LogTemp, Warning, TEXT("Thrown Grenade. Left grenade:%d"),GrenadeCount);
 	FVector SpawnLoc = GetAimTransform().GetLocation() + WeaponOwner->GetActorForwardVector() * 100.0f;
 	FRotator SpawnRot = GetAimTransform().Rotator();
 	GetWorld()->SpawnActor<AWeapon_GrenadeProjectile>(ProjectileClass, SpawnLoc, SpawnRot);
+	GrenadeCount--;
+	if (GrenadeCount <= 0)
+	{
+		DetachWeaponFromPlayer();
+		WeaponOwner->Mesh1P->PlayAnimation(nullptr, false);
+		WeaponOwner->GetMesh()->PlayAnimation(nullptr, false);
+		WeaponOwner->CurrentWeapon = nullptr;
+		Destroy();
+	}
 }

@@ -100,9 +100,7 @@ void ACSPlayer::PlayerFireSecondary()
 void ACSPlayer::PlayerStopFire()
 {
 	if (CurrentWeapon)
-	{
 		CurrentWeapon->WeaponStopFire();
-	}
 }
 
 // Called when player wants to reload
@@ -117,15 +115,15 @@ void ACSPlayer::PlayerDrop()
 {
 	if (CurrentWeapon)
 		CurrentWeapon->WeaponDrop();
+	if (LastWeapon)
+		LastWeapon->WeaponDraw(this);
 }
 
 // Called when player want to inpect weapon
 void ACSPlayer::PlayerInspect()
 {
 	if (CurrentWeapon)
-	{
 		CurrentWeapon->WeaponInspect();
-	}
 }
 
 // Called when player want to pickup weapon

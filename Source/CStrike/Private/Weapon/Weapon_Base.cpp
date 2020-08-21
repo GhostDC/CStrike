@@ -4,6 +4,7 @@
 #include "Player/CSPlayer.h"
 #include "DrawDebugHelpers.h"
 #include "CollisionQueryParams.h"
+#include "Weapon/Weapon_Grenade.h"
 #include "Camera/CameraComponent.h"
 #include "Kismet/GameplayStatics.h"
 #include "Components/StaticMeshComponent.h"
@@ -49,7 +50,7 @@ void AWeapon_Base::BeginPlay()
 void AWeapon_Base::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
-	if (FPlatformTime::Seconds() - SpawnTime >= 1.0f)
+	if (FPlatformTime::Seconds() - SpawnTime >= 1.0f && !GetOwner())
 		WeaponDropMesh->SetGenerateOverlapEvents(true);
 }
 
@@ -154,6 +155,7 @@ void AWeapon_Base::WeaponInstantFire()
 		WeaponTracePerShot();
 		if (HitResults.Num() > 0)
 		{
+			UStaticMeshComponent* HitComponent = Cast<UStaticMeshComponent>(HitResults[0].GetActor()->GetRootComponent());
 			for (int32 i = 0; i < HitResults.Num(); i++)
 			{
 				UE_LOG(LogTemp, Warning, TEXT("you just hit : %s"), *HitResults[i].GetActor()->GetFullName());
@@ -165,6 +167,7 @@ void AWeapon_Base::WeaponInstantFire()
 					UE_LOG(LogTemp, Warning, TEXT("%s got shot health : %f"), *HitPlayer->GetFullName(), HitPlayer->Health);
 				}
 			}
+			HitComponent->AddImpulse(GetActorLocation(), NAME_None, true);
 		}
 		UE_LOG(LogTemp, Warning, TEXT("PrimaryAmmo:%d ReserveAmmo:%d"), PrimaryAmmo, ReserveAmmo);
 		BurstTime++;
@@ -230,6 +233,13 @@ void AWeapon_Base::WeaponDraw(ACSPlayer* DrawPlayer)
 {
 	if (DrawPlayer)
 	{
+		if (DrawPlayer->CurrentWeapon)
+		{
+			DrawPlayer->LastWeapon = DrawPlayer->CurrentWeapon;
+			DrawPlayer->CurrentWeapon->DetachWeaponFromPlayer();
+			DrawPlayer->CurrentWeapon->Destroy();
+			DrawPlayer->CurrentWeapon = nullptr;
+		}
 		switch (WeaponType)
 		{
 		case Pistol:
@@ -260,6 +270,65 @@ void AWeapon_Base::WeaponDraw(ACSPlayer* DrawPlayer)
 				WeaponOwner->WeaponSlot[0] = this;
 			}
 		}break;
+		case Grenade:
+		{
+			AWeapon_Grenade* PickupGrenade = Cast<AWeapon_Grenade>(this);
+			switch (PickupGrenade->GrenadeType)
+			{
+			case FragGrenade:
+				WeaponAddToPlayer(DrawPlayer);
+				if (!WeaponOwner->GrenadeSlot[0])
+					WeaponOwner->GrenadeSlot[0] = PickupGrenade;
+				else
+					WeaponOwner->GrenadeSlot[0]->GrenadeCount++;
+				break;
+			case FlashGrenade:
+				WeaponAddToPlayer(DrawPlayer);
+				if (!WeaponOwner->GrenadeSlot[1])
+					WeaponOwner->GrenadeSlot[1] = PickupGrenade;
+				else
+					WeaponOwner->GrenadeSlot[1]->GrenadeCount++;
+				break;
+			case SmokeGrenade:
+				WeaponAddToPlayer(DrawPlayer);
+				if (!WeaponOwner->GrenadeSlot[2])
+					WeaponOwner->GrenadeSlot[2] = PickupGrenade;
+				else
+					WeaponOwner->GrenadeSlot[2]->GrenadeCount++;
+				break;
+			case DecoyGrenade:
+				WeaponAddToPlayer(DrawPlayer);
+				if (!WeaponOwner->GrenadeSlot[3])
+					WeaponOwner->GrenadeSlot[3] = PickupGrenade;
+				else
+					WeaponOwner->GrenadeSlot[3]->GrenadeCount++;
+				break;
+			case IncendiaryGrenade:
+				WeaponAddToPlayer(DrawPlayer);
+				if (!WeaponOwner->GrenadeSlot[4])
+					WeaponOwner->GrenadeSlot[4] = PickupGrenade;
+				else
+					WeaponOwner->GrenadeSlot[4]->GrenadeCount++;
+				break;
+			case Molotov:
+				WeaponAddToPlayer(DrawPlayer);
+				if (!WeaponOwner->GrenadeSlot[5])
+					WeaponOwner->GrenadeSlot[5] = PickupGrenade;
+				else
+					WeaponOwner->GrenadeSlot[5]->GrenadeCount++;
+				break;
+			default:
+				break;
+			}
+		}
+		case C4:
+		{
+			if (!DrawPlayer->WeaponSlot[3])
+			{
+				WeaponAddToPlayer(DrawPlayer);
+				WeaponOwner->WeaponSlot[3] = this;
+			}
+		}
 		default:
 			break;
 		}
@@ -346,7 +415,7 @@ void AWeapon_Base::WeaponTracePerShot()
 	DrawDebugLine(GetWorld(), TraceStart, TraceEnd, FColor::Orange, true, 2.0f);
 }
 
-// Get player 
+// Get player aim location transform
 FTransform AWeapon_Base::GetAimTransform()
 {
 	FVector CamLoc;
@@ -358,6 +427,12 @@ FTransform AWeapon_Base::GetAimTransform()
 		CamTrans = FTransform(CamRot, CamLoc);
 	}
 	return CamTrans;
+}
+
+// Get player weapon type
+int32 AWeapon_Base::GetWeaponType()
+{
+	return WeaponType;
 }
 
 // Check weapon can fire or not before weapon fire

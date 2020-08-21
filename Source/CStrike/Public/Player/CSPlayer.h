@@ -7,6 +7,7 @@
 #include "CSPlayer.generated.h"
 
 class AWeapon_Base;
+class AWeapon_Grenade;
 class UCameraComponent;
 class USkeletalMeshComponent;
 
@@ -28,7 +29,7 @@ public:
 	UCameraComponent* FPSCamera;
 
 	// Set player weapon slot
-	UPROPERTY(VisibleAnywhere, Category = "Weapon")
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Weapon")
 	AWeapon_Base* CurrentWeapon;
 
 	// Set player last weapon
@@ -39,9 +40,13 @@ public:
 	UPROPERTY(EditAnywhere, Category = "Config")
 	float TraceRange = 3000.0f;
 
-	// Weapon slot
+	// Weapon slots
 	UPROPERTY(EditAnywhere, Category = "Config")
 	TArray<AWeapon_Base*> WeaponSlot;
+
+	// Grenade slots
+	UPROPERTY(EditAnywhere, Category = "Config")
+	TArray<AWeapon_Grenade*> GrenadeSlot;
 
 	// Setup player health
 	float Health = 100.0f;
