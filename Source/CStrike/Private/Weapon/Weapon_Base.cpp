@@ -7,7 +7,7 @@
 #include "Weapon/Weapon_Grenade.h"
 #include "Camera/CameraComponent.h"
 #include "Kismet/GameplayStatics.h"
-#include "Components/StaticMeshComponent.h"
+#include "Components/CapsuleComponent.h"
 #include "Components/SkeletalMeshComponent.h"
 
 // Sets default values
@@ -155,19 +155,23 @@ void AWeapon_Base::WeaponInstantFire()
 		WeaponTracePerShot();
 		if (HitResults.Num() > 0)
 		{
-			UStaticMeshComponent* HitComponent = Cast<UStaticMeshComponent>(HitResults[0].GetActor()->GetRootComponent());
 			for (int32 i = 0; i < HitResults.Num(); i++)
 			{
+				AActor* HitActor = Cast<AActor>(HitResults[i].GetActor());
 				UE_LOG(LogTemp, Warning, TEXT("you just hit : %s"), *HitResults[i].GetActor()->GetFullName());
-				if (HitResults[i].Actor->IsA<ACSPlayer>())
+				if (HitActor->IsA<ACSPlayer>() && HitActor)
 				{
-					ACSPlayer* HitPlayer = Cast<ACSPlayer>(HitResults[i].Actor);
+					ACSPlayer* HitPlayer = Cast<ACSPlayer>(HitResults[i].GetActor());
 					TSubclassOf<UDamageType> DamageType;
 					UGameplayStatics::ApplyPointDamage(HitPlayer, WeaponConfig.BaseDamage, GetActorLocation(), HitResults[i], WeaponOwner->GetController(), this, DamageType);
 					UE_LOG(LogTemp, Warning, TEXT("%s got shot health : %f"), *HitPlayer->GetFullName(), HitPlayer->Health);
 				}
+				else if (HitActor->IsA<UStaticMeshComponent>())
+				{
+					UStaticMeshComponent* HitComponent = Cast<UStaticMeshComponent>(HitResults[i].GetActor());
+					HitComponent->AddImpulse(GetActorLocation(), NAME_None, true);
+				}
 			}
-			HitComponent->AddImpulse(GetActorLocation(), NAME_None, true);
 		}
 		UE_LOG(LogTemp, Warning, TEXT("PrimaryAmmo:%d ReserveAmmo:%d"), PrimaryAmmo, ReserveAmmo);
 		BurstTime++;
