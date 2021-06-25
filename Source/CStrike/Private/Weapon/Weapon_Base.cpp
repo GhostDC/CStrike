@@ -166,10 +166,14 @@ void AWeapon_Base::WeaponInstantFire()
 					UGameplayStatics::ApplyPointDamage(HitPlayer, WeaponConfig.BaseDamage, GetActorLocation(), HitResults[i], WeaponOwner->GetController(), this, DamageType);
 					UE_LOG(LogTemp, Warning, TEXT("%s got shot health : %f"), *HitPlayer->GetFullName(), HitPlayer->Health);
 				}
-				else if (HitActor->IsA<UStaticMeshComponent>())
-				{
-					UStaticMeshComponent* HitComponent = Cast<UStaticMeshComponent>(HitResults[i].GetActor());
-					HitComponent->AddImpulse(GetActorLocation(), NAME_None, true);
+				else
+				{					
+					for (auto& Element : HitActor->GetComponents())
+					{
+						UStaticMeshComponent* HitComponent = Cast<UStaticMeshComponent>(Element);
+						if (HitComponent && HitComponent->IsSimulatingPhysics())
+							HitComponent->AddImpulseAtLocation(WeaponOwner->GetActorForwardVector() * 300, HitResults[i].ImpactPoint, NAME_None);
+					}
 				}
 			}
 		}
