@@ -153,3 +153,23 @@ float ACSPlayer::TakeDamage(float DamageAmount, struct FDamageEvent const& Damag
 	}
 	return Health;
 }
+
+//////////////////////////////////////////////////////
+// Weapon property
+// Called when you want to read weapon primary ammo
+int32 ACSPlayer::GetWeaponPrimaryAmmoCount()
+{
+	if (CurrentWeapon)
+		return CurrentWeapon->PrimaryAmmo;
+	else
+		return 0;
+}
+
+// Called when you want to read weapon secoundary ammo
+int32 ACSPlayer::GetWeaponReserveAmmoCount()
+{
+	if (CurrentWeapon)
+		return CurrentWeapon->ReserveAmmo;
+	else
+		return 0;
+}

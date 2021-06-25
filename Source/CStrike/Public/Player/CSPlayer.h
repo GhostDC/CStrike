@@ -79,7 +79,7 @@ public:
 
 	// Called to ray trace per tick
 	UFUNCTION()
-		void RayTracePerTick();
+	void RayTracePerTick();
 
 	// Called to bind functionality to input
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
@@ -88,43 +88,52 @@ public:
 	// Movement
 	// Called when player wants to move forward
 	UFUNCTION(BlueprintCallable, Category = "Movement")
-		void MoveForward(float Val);
+	void MoveForward(float Val);
 
 	// Called when player wants to move right
 	UFUNCTION(BlueprintCallable, Category = "Movement")
-		void MoveRight(float Val);
+	void MoveRight(float Val);
 
 	//////////////////////////////////////////////////////
 	// Weapon action
 	// Called when player wants to primary fire
 	UFUNCTION(BlueprintCallable, Category = "Action")
-		void PlayerFirePrimary();
+	void PlayerFirePrimary();
 
 	// Called when player wants to secondary fire
 	UFUNCTION(BlueprintCallable, Category = "Action")
-		void PlayerFireSecondary();
+	void PlayerFireSecondary();
 
 	// Called when player release fire button
 	UFUNCTION(BlueprintCallable, Category = "Action")
-		void PlayerStopFire();
+	void PlayerStopFire();
 
 	// Called when player wants to reload or when weapon ammo empty and primary fire release
 	UFUNCTION(BlueprintCallable, Category = "Action")
-		void PlayerReload();
+	void PlayerReload();
 
 	// Called when player wants to drop item
 	UFUNCTION(BlueprintCallable, Category = "Action")
-		void PlayerDrop();
+	void PlayerDrop();
 
 	// Called when player wants to inspect weapon
 	UFUNCTION(BlueprintCallable, Category = "Action")
-		void PlayerInspect();
+	void PlayerInspect();
 
 	// Called when player want to pickup weapon
 	UFUNCTION(BlueprintCallable, Category = "Action")
 	void PlayerPickup();
-
+	
 	// Called when weapon fire hit player
-	//UFUNCTION(BlueprintCallable, Category = "Damage")
 	virtual float TakeDamage(float DamageAmount, struct FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser) override;
+
+	//////////////////////////////////////////////////////
+	// Weapon property
+	// Called when you want to read weapon primary ammo
+	UFUNCTION(BlueprintCallable, Category = "WeaponProperty")
+	int32 GetWeaponPrimaryAmmoCount();
+
+	// Called when you want to read weapon secoundary ammo
+	UFUNCTION(BlueprintCallable, Category = "WeaponProperty")
+	int32 GetWeaponReserveAmmoCount();
 };
