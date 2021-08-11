@@ -1,4 +1,4 @@
-##CounterStrike:GlobalOffensive in Unreal Engine 4
+# CounterStrike:GlobalOffensive in Unreal Engine 4
 
 This project is just personal project
 
@@ -53,6 +53,9 @@ just want CSGO prot to Source 2 as soon as possible
         - [ ] SCAR-20
     - Equipment
         - [ ] Zeus x27
+        - [ ] Defuse Kit
+        - [ ] Armor
+        - [ ] Helmet
   - Grenade (Grenade Base Done)
     - [ ] FragGrenade
     - [ ] SmokeGrenade
